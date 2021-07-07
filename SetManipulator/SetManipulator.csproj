@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <ApplicationIcon>icon_324_icon.ico</ApplicationIcon>
+    <Configurations>Debug;Release;Mac</Configurations>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="RowTool.cs" />
+    <Compile Remove="SetTool.cs" />
+  </ItemGroup>
+
+</Project>

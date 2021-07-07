@@ -1,0 +1,13 @@
+D:\Google Drive\Visual Studio\SetManipulator\SetManipulator\bin\Release\netcoreapp3.1\SetManipulator.exe
+D:\Google Drive\Visual Studio\SetManipulator\SetManipulator\bin\Release\netcoreapp3.1\SetManipulator.deps.json
+D:\Google Drive\Visual Studio\SetManipulator\SetManipulator\bin\Release\netcoreapp3.1\SetManipulator.runtimeconfig.json
+D:\Google Drive\Visual Studio\SetManipulator\SetManipulator\bin\Release\netcoreapp3.1\SetManipulator.runtimeconfig.dev.json
+D:\Google Drive\Visual Studio\SetManipulator\SetManipulator\bin\Release\netcoreapp3.1\SetManipulator.dll
+D:\Google Drive\Visual Studio\SetManipulator\SetManipulator\bin\Release\netcoreapp3.1\SetManipulator.pdb
+D:\Google Drive\Visual Studio\SetManipulator\SetManipulator\obj\Release\netcoreapp3.1\SetManipulator.AssemblyInfoInputs.cache
+D:\Google Drive\Visual Studio\SetManipulator\SetManipulator\obj\Release\netcoreapp3.1\SetManipulator.AssemblyInfo.cs
+D:\Google Drive\Visual Studio\SetManipulator\SetManipulator\obj\Release\netcoreapp3.1\SetManipulator.csproj.CoreCompileInputs.cache
+D:\Google Drive\Visual Studio\SetManipulator\SetManipulator\obj\Release\netcoreapp3.1\SetManipulator.dll
+D:\Google Drive\Visual Studio\SetManipulator\SetManipulator\obj\Release\netcoreapp3.1\SetManipulator.pdb
+D:\Google Drive\Visual Studio\SetManipulator\SetManipulator\obj\Release\netcoreapp3.1\SetManipulator.genruntimeconfig.cache
+D:\Google Drive\Visual Studio\SetManipulator\SetManipulator\obj\Release\netcoreapp3.1\SetManipulator.csproj.AssemblyReference.cache
