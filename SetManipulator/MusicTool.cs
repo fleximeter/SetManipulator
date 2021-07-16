@@ -43,8 +43,6 @@ namespace SetManipulator
         public virtual void ComplementPrime() => Console.WriteLine("This command is not available in the current mode.");
         public virtual void ComplexK(string command = "") => Console.WriteLine("This command is not available in the current mode.");
         public virtual void ComplexKh(string command = "") => Console.WriteLine("This command is not available in the current mode.");
-        public virtual void FindK() => Console.WriteLine("This command is not available in the current mode.");
-        public virtual void FindKh() => Console.WriteLine("This command is not available in the current mode.");
         public virtual void ICV(string command = "") => Console.WriteLine("This command is not available in the current mode.");
         public virtual void Info(string command = "") => Console.WriteLine("This command is not available in the current mode.");
         public virtual void Intersect(string command1 = "", string command2 = "") => Console.WriteLine("This command is not available in the current mode.");

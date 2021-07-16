@@ -125,7 +125,7 @@ namespace SetManipulator
                 {
                     sc[0].LoadFromPitchClassList(pc);
                     sc[1] = sc[0].GetComplement();
-                    pcset[0] = sc[0].GetSetCopy();
+                    pcset[0] = PcSeg.ToPcSet(pc);
                     if (sc[0].ForteName.Contains('Z'))
                     {
                         hasZ = true;
@@ -283,16 +283,6 @@ namespace SetManipulator
                     Console.Write("\n");
                 }
             }
-        }
-
-        public override void FindK()
-        {
-
-        }
-
-        public override void FindKh()
-        {
-
         }
 
         /// <summary>

@@ -151,15 +151,6 @@ namespace SetManipulator
                     else
                         Complement(cmd2);
                 }
-                else if (cmd1 == "FIND")
-                {
-                    if (cmd2 == "K")
-                        FindK();
-                    else if (cmd2 == "KH")
-                        FindKh();
-                    else
-                        Console.WriteLine("Invalid command. For a list of commands, enter ?.\n");
-                }
                 else if (cmd1 == "ICV")
                     ICV(cmd2);
                 else if (cmd1 == "INFO" || cmd1 == "N")
@@ -359,10 +350,6 @@ namespace SetManipulator
         void ComplexK(string command = "") => mt[mode].ComplexK(command);
 
         void ComplexKh(string command = "") => mt[mode].ComplexKh(command);
-
-        void FindK() => mt[mode].FindK();
-
-        void FindKh() => mt[mode].FindKh();
 
         void ICV(string command = "") => mt[mode].ICV(command);
 

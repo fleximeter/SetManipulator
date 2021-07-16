@@ -240,6 +240,12 @@ namespace SetManipulator
             {
                 foreach (string form in forms)
                 {
+                    if (form.Length > length)
+                        length = form.Length;
+                }
+
+                foreach (string form in forms)
+                {
                     string trimForm = form.Trim();
                     if (trimForm.Length > 0)
                     {

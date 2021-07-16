@@ -243,20 +243,24 @@ namespace SetManipulator
             // Proceed with transformations if the transform pseg is valid
             if (valid)
             {
+                for (int i = 0; i < forms.Length; i++)
+                {
+                    forms[i] = forms[i].Trim();
+                    if (forms[i].Length > length)
+                        length = forms[i].Length;
+                }
+
                 foreach (string form in forms)
                 {
-                    if (form.Length > length)
-                        length = form.Length;
-                    string trimForm = form.Trim();
-                    if (trimForm.Length > 0)
+                    if (form.Length > 0)
                     {
-                        if (PSeg.IsValidTransformation(trimForm))
+                        if (PSeg.IsValidTransformation(form))
                         {
-                            List<Pitch> secondaryForm = PSeg.Transform(transformList, trimForm);
-                            Console.WriteLine(string.Format("{0,-" + (length + 2).ToString() + "}{1}", trimForm + ":", "<" + PSeg.ToString(secondaryForm, " ") + ">"));
+                            List<Pitch> secondaryForm = PSeg.Transform(transformList, form);
+                            Console.WriteLine(string.Format("{0,-" + (length + 2).ToString() + "}{1}", form + ":", "<" + PSeg.ToString(secondaryForm, " ") + ">"));
                         }
                         else
-                            Console.WriteLine(string.Format("{0,-" + (length + 2).ToString() + "}{1}", trimForm + ": ", "Invalid transformation"));
+                            Console.WriteLine(string.Format("{0,-" + (length + 2).ToString() + "}{1}", form + ": ", "Invalid transformation"));
                     }
                 }
             }

@@ -50,7 +50,6 @@ namespace MusicTheory
         private string _setPrimeFormName;                        // The prime form name of the current set class
         private string _setForteName;                            // The Forte name of the current set class
         private int _setCarterName;                              // The Carter name of the current set class
-        private bool _useLeftPacking;                            // Whether or not to calcuate the set class using packing from the left
         private string _setIcVectorName;                         // The interval class vector of the set class (as a string)
         private int[] _setIcVector;                              // The interval class vector of the set class (as an array)
         private readonly static int NUM_PC = 12;                 // The number of unique pitch classes
@@ -126,7 +125,6 @@ namespace MusicTheory
             _setPrimeFormName = set._setPrimeFormName;
             _setForteName = set._setForteName;
             _setCarterName = set._setCarterName;
-            _useLeftPacking = set._useLeftPacking;
             _setIcVectorName = set._setIcVectorName;
             _setType = set._setType;
             foreach (PitchClass pc in set._pitchSet)
@@ -151,7 +149,6 @@ namespace MusicTheory
             _setPrimeFormName = "";
             _setForteName = "";
             _setCarterName = 0;
-            _useLeftPacking = false;
             _setIcVectorName = "";
             _setType = "";
             LoadFromPitchClassSet(pitchSet);
@@ -219,7 +216,6 @@ namespace MusicTheory
             _setPrimeFormName = "";
             _setForteName = "";
             _setCarterName = 0;
-            _useLeftPacking = false;
             _setIcVectorName = "";
             _setType = "";
         }
@@ -860,7 +856,6 @@ namespace MusicTheory
             _pitchSet.Clear();
             _setPrimeFormName = sc._setPrimeFormName;
             _setForteName = sc._setForteName;
-            _useLeftPacking = sc._useLeftPacking;
             _setIcVectorName = sc._setIcVectorName;
             _setType = sc._setType;
             foreach (PitchClass pc in sc._pitchSet)
@@ -988,7 +983,6 @@ namespace MusicTheory
             List<List<PitchClass>> listsToWeight = new List<List<PitchClass>>(2 * pitchClassList.Count);
             List<PitchClass> pitchClasses = PcSet.ToPcSeg(pitchClassList);
             List<PitchClass> inverted = PcSeg.Invert(pitchClasses);
-            List<PitchClass> final;
             HashSet<PitchClass> set = new HashSet<PitchClass>();
 
             // Add regular forms to the lists to weight
@@ -1019,21 +1013,36 @@ namespace MusicTheory
                 listsToWeight[i + pitchClassList.Count].Sort((a, b) => a.PitchClassInteger.CompareTo(b.PitchClassInteger));
             }
 
-            // If packing from the left (Forte)
-            if (_useLeftPacking)
+            // Weight the lists from the right
+            for (int i = listsToWeight[0].Count - 1; i >= 0; i--)
             {
-                int index = 0;
-                final = WeightLeft(listsToWeight, ref index);
+                if (listsToWeight.Count > 1)
+                {
+                    int smallestItem = 11;  // The smallest pitch integer we've found at the current index
+                    int j;                  // The index of the list we are looking at
+
+                    // Identify the smallest item at index i
+                    for (j = 0; j < listsToWeight.Count; j++)
+                    {
+                        if (listsToWeight[j][i].PitchClassInteger < smallestItem)
+                            smallestItem = listsToWeight[j][i].PitchClassInteger;
+                    }
+
+                    // Remove all lists that do not have the smallest item at index i
+                    j = 0;
+                    while (j < listsToWeight.Count)
+                    {
+                        if (listsToWeight[j][i].PitchClassInteger > smallestItem)
+                            listsToWeight.RemoveAt(j);
+                        else
+                            j++;
+                    }
+                }
+                else
+                    break;
             }
 
-            // If packing from the right (Regener/Rahn)
-            else
-            {
-                int index = pitchClassList.Count - 1;
-                final = WeightFromRight(listsToWeight, ref index);
-            }
-
-            foreach (PitchClass pc in final)
+            foreach (PitchClass pc in listsToWeight[0])
                 set.Add(pc);
             return set;
         }
@@ -1122,122 +1131,6 @@ namespace MusicTheory
             else
                 _setCarterName = 0;
             _setIcVectorName = "[" + Functions.HexChars[_setIcVector[0]] + Functions.HexChars[_setIcVector[1]] + Functions.HexChars[_setIcVector[2]] + Functions.HexChars[_setIcVector[3]] + Functions.HexChars[_setIcVector[4]] + Functions.HexChars[_setIcVector[5]] + Functions.HexChars[_setIcVector[6]] + ']';
-        }
-
-        /// <summary>
-        /// Weights a list of pitch classes from the right
-        /// </summary>
-        /// <param name="listsToWeight">The lists to weight</param>
-        /// <param name="currentIndex">The current index</param>
-        /// <returns>The most weighted form</returns>
-        private List<PitchClass> WeightFromRight(List<List<PitchClass>> listsToWeight, ref int currentIndex)
-        {
-            // If we've narrowed it down to one list, return that list
-            if (listsToWeight.Count == 1 || currentIndex == 0)
-            {
-                return listsToWeight[0];
-            }
-
-            // Otherwise, we need to keep narrowing down the lists
-            else
-            {
-                int smallestItem = 11;                                        // The smallest pitch integer we've found at the current index
-                List<int> validIndices = new List<int>(listsToWeight.Count);  // Valid indices that indicate lists we will pass to the next recursive call
-                
-                // Cycle through the lists and determine which indices contain the lowest pitch class.
-                // Those lists will be passed to the next recursive call.
-                for (int i = 0; i < listsToWeight.Count; i++)
-                {
-                    // If we've found an even lower pitch, clear the list of indices and start with this one
-                    if (listsToWeight[i][currentIndex].PitchClassInteger < smallestItem)
-                    {
-                        smallestItem = listsToWeight[i][currentIndex].PitchClassInteger;
-                        validIndices.Clear();
-                        validIndices.Add(i);
-                    }
-
-                    // Or, if we've found an additional occurrence of the lowest pitch,
-                    // add the current index to the list of indices
-                    else if (listsToWeight[i][currentIndex].PitchClassInteger == smallestItem)
-                    {
-                        validIndices.Add(i);
-                    }
-                }
-
-                // Eliminate all invalid permutations
-                int currentSmallestItem = validIndices.Count - 1;
-                for (int i = listsToWeight.Count - 1; i >= 0; i--)
-                {
-                    if (currentSmallestItem < 0)
-                        listsToWeight.RemoveAt(i);
-                    else if (i > validIndices[currentSmallestItem])
-                        listsToWeight.RemoveAt(i);
-                    else if (i == validIndices[currentSmallestItem])
-                        currentSmallestItem--;
-                }
-
-                // Perform the next recursive call
-                currentIndex--;
-                return WeightFromRight(listsToWeight, ref currentIndex);
-            }
-        }
-
-        /// <summary>
-        /// Weights a list of pitch classes to the left
-        /// </summary>
-        /// <param name="listsToWeight">The lists to weight</param>
-        /// <param name="currentIndex">The current index</param>
-        /// <returns>The most weighted form</returns>
-        private List<PitchClass> WeightLeft(List<List<PitchClass>> listsToWeight, ref int currentIndex)
-        {
-            // If we've narrowed it down to one list, return that list
-            if (listsToWeight.Count == 1 || currentIndex == listsToWeight[0].Count - 1)
-            {
-                return listsToWeight[0];
-            }
-
-            // Otherwise, we need to keep narrowing down the lists
-            else
-            {
-                int smallestItem = 11;                                        // The smallest pitch integer we've found at the current index
-                List<int> validIndices = new List<int>(listsToWeight.Count);  // Valid indices that indicate lists we will pass to the next recursive call
-                
-                // Cycle through the lists and determine which indices contain the lowest pitch class.
-                // Those lists will be passed to the next recursive call.
-                for (int i = 0; i < listsToWeight.Count; i++)
-                {
-                    // If we've found an even lower pitch, clear the list of indices and start with this one
-                    if (listsToWeight[i][currentIndex].PitchClassInteger < smallestItem)
-                    {
-                        smallestItem = listsToWeight[i][currentIndex].PitchClassInteger;
-                        validIndices.Clear();
-                        validIndices.Add(i);
-                    }
-
-                    // Or, if we've found an additional occurrence of the lowest pitch,
-                    // add the current index to the list of indices
-                    else if (listsToWeight[i][currentIndex].PitchClassInteger == smallestItem)
-                    {
-                        validIndices.Add(i);
-                    }
-                }
-
-                // Eliminate all invalid permutations
-                int currentSmallestItem = validIndices.Count - 1;
-                for (int i = listsToWeight.Count - 1; i >= 0; i--)
-                {
-                    if (currentSmallestItem < 0)
-                        listsToWeight.RemoveAt(i);
-                    if (i > validIndices[currentSmallestItem])
-                        listsToWeight.RemoveAt(i);
-                    else if (i == validIndices[currentSmallestItem])
-                        currentSmallestItem--;
-                }
-
-                // Perform the next recursive call
-                currentIndex++;
-                return WeightLeft(listsToWeight, ref currentIndex);
-            }
         }
     }
 }

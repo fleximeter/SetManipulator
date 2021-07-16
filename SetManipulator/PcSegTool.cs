@@ -404,6 +404,13 @@ namespace SetManipulator
             // Proceed with transformations if the transform set is valid
             if (valid)
             {
+                // Set the max length for formatting
+                foreach (string form in forms)
+                {
+                    if (form.Length > length)
+                        length = form.Length;
+                }
+
                 // We don't do this if the user provided a custom pcseg
                 if (_haveRow && !custom)
                 {
