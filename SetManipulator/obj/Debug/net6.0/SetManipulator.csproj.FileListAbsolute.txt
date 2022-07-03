@@ -1,0 +1,45 @@
+E:\My Drive\Visual Studio\SetManipulator\SetManipulator\bin\Debug\net6.0\SetManipulator.exe
+E:\My Drive\Visual Studio\SetManipulator\SetManipulator\bin\Debug\net6.0\SetManipulator.deps.json
+E:\My Drive\Visual Studio\SetManipulator\SetManipulator\bin\Debug\net6.0\SetManipulator.runtimeconfig.json
+E:\My Drive\Visual Studio\SetManipulator\SetManipulator\bin\Debug\net6.0\SetManipulator.dll
+E:\My Drive\Visual Studio\SetManipulator\SetManipulator\bin\Debug\net6.0\ref\SetManipulator.dll
+E:\My Drive\Visual Studio\SetManipulator\SetManipulator\bin\Debug\net6.0\SetManipulator.pdb
+E:\My Drive\Visual Studio\SetManipulator\SetManipulator\obj\Debug\net6.0\SetManipulator.csproj.AssemblyReference.cache
+E:\My Drive\Visual Studio\SetManipulator\SetManipulator\obj\Debug\net6.0\SetManipulator.GeneratedMSBuildEditorConfig.editorconfig
+E:\My Drive\Visual Studio\SetManipulator\SetManipulator\obj\Debug\net6.0\SetManipulator.AssemblyInfoInputs.cache
+E:\My Drive\Visual Studio\SetManipulator\SetManipulator\obj\Debug\net6.0\SetManipulator.AssemblyInfo.cs
+E:\My Drive\Visual Studio\SetManipulator\SetManipulator\obj\Debug\net6.0\SetManipulator.csproj.CoreCompileInputs.cache
+E:\My Drive\Visual Studio\SetManipulator\SetManipulator\obj\Debug\net6.0\SetManipulator.dll
+E:\My Drive\Visual Studio\SetManipulator\SetManipulator\obj\Debug\net6.0\ref\SetManipulator.dll
+E:\My Drive\Visual Studio\SetManipulator\SetManipulator\obj\Debug\net6.0\SetManipulator.pdb
+E:\My Drive\Visual Studio\SetManipulator\SetManipulator\obj\Debug\net6.0\SetManipulator.genruntimeconfig.cache
+G:\My Drive\Visual Studio\SetManipulator\SetManipulator\obj\Debug\net6.0\SetManipulator.csproj.AssemblyReference.cache
+G:\My Drive\Visual Studio\SetManipulator\SetManipulator\obj\Debug\net6.0\SetManipulator.GeneratedMSBuildEditorConfig.editorconfig
+G:\My Drive\Visual Studio\SetManipulator\SetManipulator\obj\Debug\net6.0\SetManipulator.AssemblyInfoInputs.cache
+G:\My Drive\Visual Studio\SetManipulator\SetManipulator\obj\Debug\net6.0\SetManipulator.AssemblyInfo.cs
+G:\My Drive\Visual Studio\SetManipulator\SetManipulator\obj\Debug\net6.0\SetManipulator.csproj.CoreCompileInputs.cache
+G:\My Drive\Visual Studio\SetManipulator\SetManipulator\obj\Debug\net6.0\SetManipulator.dll
+G:\My Drive\Visual Studio\SetManipulator\SetManipulator\obj\Debug\net6.0\SetManipulator.pdb
+G:\My Drive\Visual Studio\SetManipulator\SetManipulator\bin\Debug\net6.0\SetManipulator.exe
+G:\My Drive\Visual Studio\SetManipulator\SetManipulator\bin\Debug\net6.0\SetManipulator.deps.json
+G:\My Drive\Visual Studio\SetManipulator\SetManipulator\bin\Debug\net6.0\SetManipulator.runtimeconfig.json
+G:\My Drive\Visual Studio\SetManipulator\SetManipulator\bin\Debug\net6.0\SetManipulator.dll
+G:\My Drive\Visual Studio\SetManipulator\SetManipulator\bin\Debug\net6.0\SetManipulator.pdb
+G:\My Drive\Visual Studio\SetManipulator\SetManipulator\obj\Debug\net6.0\refint\SetManipulator.dll
+G:\My Drive\Visual Studio\SetManipulator\SetManipulator\obj\Debug\net6.0\SetManipulator.genruntimeconfig.cache
+G:\My Drive\Visual Studio\SetManipulator\SetManipulator\obj\Debug\net6.0\ref\SetManipulator.dll
+C:\Users\jeffr\Source\repos\SetManipulator\SetManipulator\bin\Debug\net6.0\SetManipulator.exe
+C:\Users\jeffr\Source\repos\SetManipulator\SetManipulator\bin\Debug\net6.0\SetManipulator.deps.json
+C:\Users\jeffr\Source\repos\SetManipulator\SetManipulator\bin\Debug\net6.0\SetManipulator.runtimeconfig.json
+C:\Users\jeffr\Source\repos\SetManipulator\SetManipulator\bin\Debug\net6.0\SetManipulator.dll
+C:\Users\jeffr\Source\repos\SetManipulator\SetManipulator\bin\Debug\net6.0\SetManipulator.pdb
+C:\Users\jeffr\Source\repos\SetManipulator\SetManipulator\obj\Debug\net6.0\SetManipulator.csproj.AssemblyReference.cache
+C:\Users\jeffr\Source\repos\SetManipulator\SetManipulator\obj\Debug\net6.0\SetManipulator.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\jeffr\Source\repos\SetManipulator\SetManipulator\obj\Debug\net6.0\SetManipulator.AssemblyInfoInputs.cache
+C:\Users\jeffr\Source\repos\SetManipulator\SetManipulator\obj\Debug\net6.0\SetManipulator.AssemblyInfo.cs
+C:\Users\jeffr\Source\repos\SetManipulator\SetManipulator\obj\Debug\net6.0\SetManipulator.csproj.CoreCompileInputs.cache
+C:\Users\jeffr\Source\repos\SetManipulator\SetManipulator\obj\Debug\net6.0\SetManipulator.dll
+C:\Users\jeffr\Source\repos\SetManipulator\SetManipulator\obj\Debug\net6.0\refint\SetManipulator.dll
+C:\Users\jeffr\Source\repos\SetManipulator\SetManipulator\obj\Debug\net6.0\SetManipulator.pdb
+C:\Users\jeffr\Source\repos\SetManipulator\SetManipulator\obj\Debug\net6.0\SetManipulator.genruntimeconfig.cache
+C:\Users\jeffr\Source\repos\SetManipulator\SetManipulator\obj\Debug\net6.0\ref\SetManipulator.dll

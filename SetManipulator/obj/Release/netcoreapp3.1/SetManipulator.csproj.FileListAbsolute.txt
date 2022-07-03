@@ -11,3 +11,17 @@ D:\Google Drive\Visual Studio\SetManipulator\SetManipulator\obj\Release\netcorea
 D:\Google Drive\Visual Studio\SetManipulator\SetManipulator\obj\Release\netcoreapp3.1\SetManipulator.pdb
 D:\Google Drive\Visual Studio\SetManipulator\SetManipulator\obj\Release\netcoreapp3.1\SetManipulator.genruntimeconfig.cache
 D:\Google Drive\Visual Studio\SetManipulator\SetManipulator\obj\Release\netcoreapp3.1\SetManipulator.csproj.AssemblyReference.cache
+E:\My Drive\Visual Studio\SetManipulator\SetManipulator\bin\Release\netcoreapp3.1\SetManipulator.exe
+E:\My Drive\Visual Studio\SetManipulator\SetManipulator\bin\Release\netcoreapp3.1\SetManipulator.deps.json
+E:\My Drive\Visual Studio\SetManipulator\SetManipulator\bin\Release\netcoreapp3.1\SetManipulator.runtimeconfig.json
+E:\My Drive\Visual Studio\SetManipulator\SetManipulator\bin\Release\netcoreapp3.1\SetManipulator.runtimeconfig.dev.json
+E:\My Drive\Visual Studio\SetManipulator\SetManipulator\bin\Release\netcoreapp3.1\SetManipulator.dll
+E:\My Drive\Visual Studio\SetManipulator\SetManipulator\bin\Release\netcoreapp3.1\SetManipulator.pdb
+E:\My Drive\Visual Studio\SetManipulator\SetManipulator\obj\Release\netcoreapp3.1\SetManipulator.csproj.AssemblyReference.cache
+E:\My Drive\Visual Studio\SetManipulator\SetManipulator\obj\Release\netcoreapp3.1\SetManipulator.GeneratedMSBuildEditorConfig.editorconfig
+E:\My Drive\Visual Studio\SetManipulator\SetManipulator\obj\Release\netcoreapp3.1\SetManipulator.AssemblyInfoInputs.cache
+E:\My Drive\Visual Studio\SetManipulator\SetManipulator\obj\Release\netcoreapp3.1\SetManipulator.AssemblyInfo.cs
+E:\My Drive\Visual Studio\SetManipulator\SetManipulator\obj\Release\netcoreapp3.1\SetManipulator.csproj.CoreCompileInputs.cache
+E:\My Drive\Visual Studio\SetManipulator\SetManipulator\obj\Release\netcoreapp3.1\SetManipulator.dll
+E:\My Drive\Visual Studio\SetManipulator\SetManipulator\obj\Release\netcoreapp3.1\SetManipulator.pdb
+E:\My Drive\Visual Studio\SetManipulator\SetManipulator\obj\Release\netcoreapp3.1\SetManipulator.genruntimeconfig.cache
