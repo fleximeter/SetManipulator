@@ -1,62 +1,19 @@
-﻿/* File: PcSetClass.cs
-** Project: MusicTheory
-** Author: Jeffrey Martin
-**
-** This file contains the implementation of the PcSetClass class.
-**
-** Copyright © 2021 by Jeffrey Martin. All rights reserved.
-** Email: jmartin@jeffreymartincomposer.com
-** Website: https://jeffreymartincomposer.com
-**
-******************************************************************************
-**
-** This program is free software: you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation, either version 3 of the License, or
-** (at your option) any later version.
-**
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-** GNU General Public License for more details.
-**
-** You should have received a copy of the GNU General Public License
-** along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
+﻿using System.Collections.Generic;
 
-using System.Collections.Generic;
 
 namespace MusicTheory
 {
     /// <summary>
-    /// Specifies which set-class name takes precedence
+    /// Represents a microtonal pitch class set
     /// </summary>
-    public enum PrimarySetName
+    public class PcSetClass24
     {
-        Forte,
-        PrimeForm
-    }
-
-    /// <summary>
-    /// Represents a pitch class set
-    /// </summary>
-    public class PcSetClass
-    {
-        private HashSet<PitchClass> _pitchSet;                       // The pitch class set class
-        private Dictionary<string, string> _forteToCarterNames;      // A Carter name table
-        private Dictionary<string, string> _setToForteNames;         // A Forte name table
-        private Dictionary<string, string> _setToForteNamesLeft;     // A Forte name table
-        private Dictionary<string, string> _forteToSetNames;         // A pitch set class name table
-        private Dictionary<string, string> _forteToSetNamesLeft;     // A pitch set class name table
-        private Dictionary<string, string> _zTable;                  // A Z-relation table
-        private Dictionary<string, string> _carterDerivedCoreTable;  // A Carter derived core harmony table
+        private HashSet<PitchClass24> _pitchSet;                     // The pitch class set class
         private bool _packFromRight;                                 // Whether or not to pack from the right
         private string _setPrimeFormName;                            // The prime form name of the current set class
-        private string _setForteName;                                // The Forte name of the current set class
-        private int _setCarterName;                                  // The Carter name of the current set class
         private string _setIcVectorName;                             // The interval class vector of the set class (as a string)
         private int[] _setIcVector;                                  // The interval class vector of the set class (as an array)
-        private readonly static int NUM_PC = 12;                     // The number of unique pitch classes
+        private readonly static int NUM_PC = 24;                     // The number of unique pitch classes
         private string _setType;                                     // The set class type
 
         /// <summary>
@@ -68,16 +25,6 @@ namespace MusicTheory
         /// The prime form name of the set class
         /// </summary>
         public string PrimeFormName { get { return _setPrimeFormName; } }
-
-        /// <summary>
-        /// The Forte name of the set class
-        /// </summary>
-        public string ForteName { get { return _setForteName; } }
-
-        /// <summary>
-        /// The Carter name of the set class
-        /// </summary>
-        public int CarterName { get { return _setCarterName; } }
 
         /// <summary>
         /// The interval class vector of the set class
@@ -95,7 +42,8 @@ namespace MusicTheory
         public bool PackFromRight
         {
             get { return _packFromRight; }
-            set {
+            set
+            {
                 _packFromRight = value;
                 LoadFromPitchClassSet(_pitchSet);
             }
@@ -110,9 +58,9 @@ namespace MusicTheory
         /// Creates a new empty set class
         /// </summary>
         /// <param name="nameTables">An array of name tables</param>
-        public PcSetClass(Dictionary<string, string>[] nameTables)
+        public PcSetClass24()
         {
-            Construct(nameTables);
+            Construct();
         }
 
         /// <summary>
@@ -120,9 +68,9 @@ namespace MusicTheory
         /// </summary>
         /// <param name="pitchList">A pitch class list</param>
         /// <param name="nameTables">An array of name tables</param>
-        public PcSetClass(List<PitchClass> pitchList, Dictionary<string, string>[] nameTables)
+        public PcSetClass24(List<PitchClass24> pitchList)
         {
-            Construct(nameTables);
+            Construct();
             LoadFromPitchClassList(pitchList);
         }
 
@@ -130,25 +78,16 @@ namespace MusicTheory
         /// Creates a new set class from an existing set class
         /// </summary>
         /// <param name="set">An existing set class</param>
-        public PcSetClass(PcSetClass set)
+        public PcSetClass24(PcSetClass24 set)
         {
-            _setToForteNames = set._setToForteNames;
-            _forteToSetNames = set._forteToSetNames;
-            _setToForteNamesLeft = set._setToForteNamesLeft;
-            _forteToSetNamesLeft = set._forteToSetNamesLeft;
-            _forteToCarterNames = set._forteToCarterNames;
-            _zTable = set._zTable;
-            _carterDerivedCoreTable = set._carterDerivedCoreTable;
             _packFromRight = set._packFromRight;
-            _pitchSet = new HashSet<PitchClass>();
-            _setIcVector = new int[7];
+            _pitchSet = new HashSet<PitchClass24>();
+            _setIcVector = new int[13];
             _setPrimeFormName = set._setPrimeFormName;
-            _setForteName = set._setForteName;
-            _setCarterName = set._setCarterName;
             _setIcVectorName = set._setIcVectorName;
             _setType = set._setType;
-            foreach (PitchClass pc in set._pitchSet)
-                _pitchSet.Add(new PitchClass(pc));
+            foreach (PitchClass24 pc in set._pitchSet)
+                _pitchSet.Add(new PitchClass24(pc));
             for (int i = 0; i < set._setIcVector.Length; i++)
                 _setIcVector[i] = set._setIcVector[i];
         }
@@ -156,23 +95,14 @@ namespace MusicTheory
         /// <summary>
         /// Creates a new set class
         /// </summary>
-        /// <param name="pitchClasses">A list of pitch classes</param>
+        /// <param name="PitchClass24es">A list of pitch classes</param>
         /// <param name="set">An existing set class</param>
-        public PcSetClass(HashSet<PitchClass> pitchSet, PcSetClass set)
+        public PcSetClass24(HashSet<PitchClass24> pitchSet, PcSetClass24 set)
         {
-            _setToForteNames = set._setToForteNames;
-            _forteToSetNames = set._forteToSetNames;
-            _setToForteNamesLeft = set._setToForteNamesLeft;
-            _forteToSetNamesLeft = set._forteToSetNamesLeft;
-            _forteToCarterNames = set._forteToCarterNames;
-            _zTable = set._zTable;
-            _carterDerivedCoreTable = set._carterDerivedCoreTable;
-            _pitchSet = new HashSet<PitchClass>();
+            _pitchSet = new HashSet<PitchClass24>();
             _packFromRight = set._packFromRight;
-            _setIcVector = new int[7] { 0, 0, 0, 0, 0, 0, 0 };
+            _setIcVector = new int[13] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
             _setPrimeFormName = "";
-            _setForteName = "";
-            _setCarterName = 0;
             _setIcVectorName = "";
             _setType = "";
             LoadFromPitchClassSet(pitchSet);
@@ -182,20 +112,27 @@ namespace MusicTheory
         /// Calculates the ANGLE between two set classes, based on interval class vector
         /// (Damon Scott and Eric J. Isaacson, "The Interval Angle: A Similarity Measure
         /// for Pitch-Class Sets," Perspectives of New Music 36:2 (Summer, 1998), 107-142)
+        /// Adjusted for microtonal ic vector
         /// </summary>
         /// <param name="set1">A set class</param>
         /// <param name="set2">A set class</param>
         /// <returns>The ANGLE between the two set classes, in radians</returns>
-        public static double CalculateAngle(PcSetClass set1, PcSetClass set2)
+        public static double CalculateAngle(PcSetClass24 set1, PcSetClass24 set2)
         {
             int[] ic1 = set1.ICVector;
             int[] ic2 = set2.ICVector;
             return System.Math.Acos(
-                (ic1[0] * ic2[0] + ic1[1] * ic2[1] + ic1[2] * ic2[2] + ic1[3] * ic2[3] + ic1[4] * ic2[4] + ic1[5] * ic2[5])
+                (ic1[0] * ic2[0] + ic1[1] * ic2[1] + ic1[2] * ic2[2] + ic1[3] * ic2[3] + ic1[4] * ic2[4] + ic1[5] * ic2[5] +
+                ic1[6] * ic2[6] + ic1[7] * ic2[7] + ic1[8] * ic2[8] + ic1[9] * ic2[9] + ic1[10] * ic2[10] + ic1[11] * ic2[11])
                 / (System.Math.Sqrt(System.Math.Pow(ic1[0], 2) + System.Math.Pow(ic1[1], 2) + System.Math.Pow(ic1[2], 2)
-                + System.Math.Pow(ic1[3], 2) + System.Math.Pow(ic1[4], 2) + System.Math.Pow(ic1[5], 2))
+                + System.Math.Pow(ic1[3], 2) + System.Math.Pow(ic1[4], 2) + System.Math.Pow(ic1[5], 2)
+                + System.Math.Pow(ic1[6], 2) + System.Math.Pow(ic1[7], 2) + System.Math.Pow(ic1[8], 2)
+                + System.Math.Pow(ic1[9], 2) + System.Math.Pow(ic1[10], 2) + System.Math.Pow(ic1[11], 2)
+                )
                 * System.Math.Sqrt(System.Math.Pow(ic2[0], 2) + System.Math.Pow(ic2[1], 2) + System.Math.Pow(ic2[2], 2)
-                + System.Math.Pow(ic2[3], 2) + System.Math.Pow(ic2[4], 2) + System.Math.Pow(ic2[5], 2))));
+                + System.Math.Pow(ic2[3], 2) + System.Math.Pow(ic2[4], 2) + System.Math.Pow(ic2[5], 2)
+                + System.Math.Pow(ic2[6], 2) + System.Math.Pow(ic2[7], 2) + System.Math.Pow(ic2[8], 2)
+                + System.Math.Pow(ic2[9], 2) + System.Math.Pow(ic2[10], 2) + System.Math.Pow(ic2[11], 2))));
         }
 
         /// <summary>
@@ -205,12 +142,12 @@ namespace MusicTheory
         /// </summary>
         /// <param name="listToVector">The list to calculate the index vector</param>
         /// <returns>The index vector</returns>
-        public static int[] CalculateIndexVector(List<PitchClass> listToVector)
+        public static int[] CalculateIndexVector(List<PitchClass24> listToVector)
         {
             int[] indexVector = new int[12] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
             for (int i = 0; i < listToVector.Count; i++)
             {
-                for(int j = 0; j < listToVector.Count; j++)
+                for (int j = 0; j < listToVector.Count; j++)
                     indexVector[(listToVector[i].PitchClassInteger + listToVector[j].PitchClassInteger) % NUM_PC]++;
             }
             return indexVector;
@@ -228,22 +165,12 @@ namespace MusicTheory
         /// <summary>
         /// Handles common constructor functionality
         /// </summary>
-        /// <param name="nameTables">A dictionary array of 5 name tables</param>
-        private void Construct(Dictionary<string, string>[] nameTables)
+        private void Construct()
         {
-            _setToForteNames = nameTables[0];
-            _forteToSetNames = nameTables[1];
-            _setToForteNamesLeft = nameTables[2];
-            _forteToSetNamesLeft = nameTables[3];
-            _forteToCarterNames = nameTables[4];
-            _zTable = nameTables[5];
-            _carterDerivedCoreTable = nameTables[6];
             _packFromRight = true;
-            _pitchSet = new HashSet<PitchClass>();
-            _setIcVector = new int[7] { 0, 0, 0, 0, 0, 0, 0 };
+            _pitchSet = new HashSet<PitchClass24>();
+            _setIcVector = new int[13] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
             _setPrimeFormName = "";
-            _setForteName = "";
-            _setCarterName = 0;
             _setIcVectorName = "";
             _setType = "";
         }
@@ -251,16 +178,16 @@ namespace MusicTheory
         /// <summary>
         /// Checks to see if the set class contains a specific pitch class
         /// </summary>
-        /// <param name="pitchClass">The pitch class to look for</param>
+        /// <param name="PitchClass24">The pitch class to look for</param>
         /// <returns>True if the set class contains the pitch class; false otherwise</returns>
-        public bool Contains(PitchClass pitchClass) => _pitchSet.Contains(pitchClass);
+        public bool Contains(PitchClass24 PitchClass24) => _pitchSet.Contains(PitchClass24);
 
         /// <summary>
         /// Checks to see if the set class contains a specific subset
         /// </summary>
         /// <param name="subset">The subset class</param>
         /// <returns>True if the set class contains the subset class; false otherwise</returns>
-        public bool ContainsSubset(PcSetClass subset)
+        public bool ContainsSubset(PcSetClass24 subset)
         {
             if (subset is null)
                 return true;
@@ -268,16 +195,10 @@ namespace MusicTheory
                 return true;
             else if (subset.Count > _pitchSet.Count)
                 return false;
-            else if (subset.Count == _pitchSet.Count)
-            {
-                if (subset.ForteName == _setForteName)
-                    return true;
-                return false;
-            }
             else
             {
-                HashSet<PitchClass> transpose;
-                HashSet<PitchClass> invert;
+                HashSet<PitchClass24> transpose;
+                HashSet<PitchClass24> invert;
                 for (int i = 0; i < NUM_PC; i++)
                 {
                     transpose = PcSet.Transpose(subset._pitchSet, i);
@@ -295,14 +216,14 @@ namespace MusicTheory
         /// </summary>
         /// <param name="obj">The set class</param>
         /// <returns>True if the set classes are equal; false otherwise</returns>
-        public override bool Equals(object obj) => Equals(obj as PcSetClass);
+        public override bool Equals(object obj) => Equals(obj as PcSetClass24);
 
         /// <summary>
         /// Compares two set classes for equality
         /// </summary>
         /// <param name="set">The set class</param>
         /// <returns>True if the set classes are equal; false otherwise</returns>
-        public bool Equals(PcSetClass set)
+        public bool Equals(PcSetClass24 set)
         {
             if (set != null)
                 return _pitchSet.Equals(set._pitchSet);
@@ -315,7 +236,7 @@ namespace MusicTheory
         /// </summary>
         /// <param name="pitchSet">The pitch list to analyze</param>
         /// <returns>A list of matching set names</returns>
-        public List<string> FindTransformationName(HashSet<PitchClass> pitchSet)
+        public List<string> FindTransformationName(HashSet<PitchClass24> pitchSet)
         {
             List<string> transposeNames = new List<string>();
             List<string> invertNames = new List<string>();
@@ -327,17 +248,17 @@ namespace MusicTheory
                 {
                     bool transposeMatch = true;
                     bool invertMatch = true;
-                    HashSet<PitchClass> transpose = Transpose(i);
-                    HashSet<PitchClass> invert = InvertTranspose(i);
-                    foreach (PitchClass pc in pitchSet)
+                    HashSet<PitchClass24> transpose = Transpose(i);
+                    HashSet<PitchClass24> invert = InvertTranspose(i);
+                    foreach (PitchClass24 pc in pitchSet)
                     {
                         if (!transpose.Contains(pc))
                         {
                             transposeMatch = false;
                             break;
-                        }    
+                        }
                     }
-                    foreach (PitchClass pc in pitchSet)
+                    foreach (PitchClass24 pc in pitchSet)
                     {
                         if (!invert.Contains(pc))
                         {
@@ -361,17 +282,17 @@ namespace MusicTheory
         /// Gets the complement PcSetClass. Note that this is an abstract complement.
         /// </summary>
         /// <returns>The complement</returns>
-        public PcSetClass GetComplement()
+        public PcSetClass24 GetComplement()
         {
-            PcSetClass complement;
-            HashSet<PitchClass> pitches = new HashSet<PitchClass>();
+            PcSetClass24 complement;
+            HashSet<PitchClass24> pitches = new HashSet<PitchClass24>();
             for (int i = 0; i < NUM_PC; i++)
             {
-                PitchClass pc = new PitchClass(i);
+                PitchClass24 pc = new PitchClass24(i);
                 if (!_pitchSet.Contains(pc))
-                   pitches.Add(pc);
+                    pitches.Add(pc);
             }
-            complement = new PcSetClass(pitches, this);
+            complement = new PcSetClass24(pitches, this);
             return complement;
         }
 
@@ -388,44 +309,33 @@ namespace MusicTheory
             else
             {
                 int code = 0;
-                foreach (PitchClass pc in _pitchSet)
+                foreach (PitchClass24 pc in _pitchSet)
                     code ^= pc.PitchClassInteger;
                 return code;
             }
         }
 
         /// <summary>
-        /// Gets whether or not the PcSetClass is a Carter derived core harmony
-        /// </summary>
-        /// <returns>True or false</returns>
-        public bool GetIsDerivedCore()
-        {
-            if (_carterDerivedCoreTable.ContainsKey(_setPrimeFormName))
-                return true;
-            return false;
-        }
-
-        /// <summary>
         /// Gets a collection of secondary forms that contain a provided collection of pitches
         /// </summary>
-        /// <param name="pitchClasses">The pitch classes to search for</param>
+        /// <param name="PitchClasses">The pitch classes to search for</param>
         /// <returns>The secondary forms</returns>
-        public List<Pair<string, HashSet<PitchClass>>> GetSecondaryForms(List<PitchClass> pitchClasses)
+        public List<Pair<string, HashSet<PitchClass24>>> GetSecondaryForms(List<PitchClass24> PitchClasses)
         {
-            List<Pair<string, HashSet<PitchClass>>> secondaryForms = new List<Pair<string, HashSet<PitchClass>>>();
+            List<Pair<string, HashSet<PitchClass24>>> secondaryForms = new List<Pair<string, HashSet<PitchClass24>>>();
 
-            // The cardinality of pitchClasses cannot be greater than the cardinality of the set
-            if (pitchClasses.Count <= _pitchSet.Count)
+            // The cardinality of PitchClass24es cannot be greater than the cardinality of the set
+            if (PitchClasses.Count <= _pitchSet.Count)
             {
                 // Brute-force all Tn- and TnI-related pcsets. Note that the provided pcs may match multiple related pcsets.
                 for (int i = 0; i < NUM_PC; i++)
                 {
-                    HashSet<PitchClass> transpose = PcSet.Transpose(_pitchSet, i);
-                    HashSet<PitchClass> invert = PcSet.Transpose(PcSet.Invert(_pitchSet), i);
+                    HashSet<PitchClass24> transpose = PcSet.Transpose(_pitchSet, i);
+                    HashSet<PitchClass24> invert = PcSet.Transpose(PcSet.Invert(_pitchSet), i);
                     bool isTranspose = true;
                     bool isInvert = true;
 
-                    foreach (PitchClass pc in pitchClasses)
+                    foreach (PitchClass24 pc in PitchClasses)
                     {
                         if (!transpose.Contains(pc))
                         {
@@ -433,7 +343,7 @@ namespace MusicTheory
                             break;
                         }
                     }
-                    foreach (PitchClass pc in pitchClasses)
+                    foreach (PitchClass24 pc in PitchClasses)
                     {
                         if (!invert.Contains(pc))
                         {
@@ -443,9 +353,9 @@ namespace MusicTheory
                     }
 
                     if (isTranspose)
-                        secondaryForms.Add(new Pair<string, HashSet<PitchClass>>('T' + i.ToString(), transpose));
+                        secondaryForms.Add(new Pair<string, HashSet<PitchClass24>>('T' + i.ToString(), transpose));
                     if (isInvert)
-                        secondaryForms.Add(new Pair<string, HashSet<PitchClass>>('T' + i.ToString() + 'I', invert));
+                        secondaryForms.Add(new Pair<string, HashSet<PitchClass24>>('T' + i.ToString() + 'I', invert));
                 }
             }
 
@@ -459,11 +369,11 @@ namespace MusicTheory
         /// Gets a copy of the pc-set-class prime form.
         /// </summary>
         /// <returns>A pc set</returns>
-        public HashSet<PitchClass> GetSetCopy()
+        public HashSet<PitchClass24> GetSetCopy()
         {
-            HashSet<PitchClass> set = new HashSet<PitchClass>();
-            foreach (PitchClass pc in _pitchSet)
-                set.Add(new PitchClass(pc));
+            HashSet<PitchClass24> set = new HashSet<PitchClass24>();
+            foreach (PitchClass24 pc in _pitchSet)
+                set.Add(new PitchClass24(pc));
             return set;
         }
 
@@ -471,64 +381,34 @@ namespace MusicTheory
         /// Gets all subsets of the current set
         /// </summary>
         /// <returns>A list of subsets</returns>
-        public List<Pair<PcSetClass, int>> GetSubsets(PrimarySetName namePreference = PrimarySetName.PrimeForm)
+        public List<Pair<PcSetClass24, int>> GetSubsets()
         {
-            List<Pair<PcSetClass, int>> subsets = new List<Pair<PcSetClass, int>>();
+            List<Pair<PcSetClass24, int>> subsets = new List<Pair<PcSetClass24, int>>();
             Dictionary<string, int> foundSets = new Dictionary<string, int>();
-            List<HashSet<PitchClass>> store = PcSet.Subsets(_pitchSet);
+            List<HashSet<PitchClass24>> store = PcSet.Subsets(_pitchSet);
 
             // Remove duplicate set-classes
             for (int i = 0; i < store.Count; i++)
             {
-                PcSetClass set = new PcSetClass(store[i], this);
+                PcSetClass24 set = new PcSetClass24(store[i], this);
                 if (!foundSets.ContainsKey(set._setPrimeFormName))
                 {
-                    subsets.Add(new Pair<PcSetClass, int>(set, 1));
+                    subsets.Add(new Pair<PcSetClass24, int>(set, 1));
                     foundSets[set._setPrimeFormName] = subsets.Count - 1;
                 }
                 else
                     subsets[foundSets[set._setPrimeFormName]].Item2++;
             }
 
-            if (namePreference == PrimarySetName.Forte)
+            subsets.Sort((a, b) =>
             {
-                subsets.Sort((a, b) =>
-                {
-                    string[] a_sub = a.Item1._setForteName.Split('-');
-                    string[] b_sub = b.Item1._setForteName.Split('-');
-                    if (a_sub[1][0] == 'Z')
-                        a_sub[1] = a_sub[1].Trim('Z');
-                    if (b_sub[1][0] == 'Z')
-                        b_sub[1] = b_sub[1].Trim('Z');
-                    if (a_sub[0].Length < b_sub[0].Length)
-                        return -1;
-                    else if (a_sub[0].Length > b_sub[0].Length)
-                        return 1;
-                    else if (a_sub[0] != b_sub[0])
-                        return a_sub[0].CompareTo(b_sub[0]);
-                    else
-                    {
-                        if (a_sub[1].Length < b_sub[1].Length)
-                            return -1;
-                        else if (a_sub[1].Length > b_sub[1].Length)
-                            return 1;
-                        else
-                            return a_sub[1].CompareTo(b_sub[1]);
-                    }
-                });
-            }
-            else
-            {
-                subsets.Sort((a, b) =>
-                {
-                    if (a.Item1.Count < b.Item1.Count)
-                        return -1;
-                    else if (a.Item1.Count > b.Item1.Count)
-                        return 1;
-                    else
-                        return a.Item1._setPrimeFormName.CompareTo(b.Item1._setPrimeFormName);
-                });
-            }
+                if (a.Item1.Count < b.Item1.Count)
+                    return -1;
+                else if (a.Item1.Count > b.Item1.Count)
+                    return 1;
+                else
+                    return a.Item1._setPrimeFormName.CompareTo(b.Item1._setPrimeFormName);
+            });
 
             return subsets;
         }
@@ -537,23 +417,22 @@ namespace MusicTheory
         /// Gets all subsets of the current set of a specified cardinality
         /// </summary>
         /// <param name="cardinality">The cardinality of the subsets</param>
-        /// <param name="sortByForte">Whether or not to sort by Forte name</param>
         /// <returns>A list of subsets</returns>
-        public List<Pair<PcSetClass, int>> GetSubsets(int cardinality, PrimarySetName namePreference = PrimarySetName.PrimeForm)
+        public List<Pair<PcSetClass24, int>> GetSubsets(int cardinality)
         {
-            List<Pair<PcSetClass, int>> subsets = new List<Pair<PcSetClass, int>>();
+            List<Pair<PcSetClass24, int>> subsets = new List<Pair<PcSetClass24, int>>();
             Dictionary<string, int> foundSets = new Dictionary<string, int>();
-            List<HashSet<PitchClass>> store = PcSet.Subsets(_pitchSet);
+            List<HashSet<PitchClass24>> store = PcSet.Subsets(_pitchSet);
 
             // Remove duplicate set-classes and set-classes of the wrong size
             for (int i = 0; i < store.Count; i++)
             {
                 if (store[i].Count == cardinality)
                 {
-                    PcSetClass set = new PcSetClass(store[i], this);
+                    PcSetClass24 set = new PcSetClass24(store[i], this);
                     if (!foundSets.ContainsKey(set._setPrimeFormName))
                     {
-                        subsets.Add(new Pair<PcSetClass, int>(set, 1));
+                        subsets.Add(new Pair<PcSetClass24, int>(set, 1));
                         foundSets[set._setPrimeFormName] = subsets.Count - 1;
                     }
                     else
@@ -561,90 +440,17 @@ namespace MusicTheory
                 }
             }
 
-            if (namePreference == PrimarySetName.Forte)
+            subsets.Sort((a, b) =>
             {
-                subsets.Sort((a, b) =>
-                {
-                    string[] a_sub = a.Item1._setForteName.Split('-');
-                    string[] b_sub = b.Item1._setForteName.Split('-');
-                    if (a_sub[1][0] == 'Z')
-                        a_sub[1] = a_sub[1].Trim('Z');
-                    if (b_sub[1][0] == 'Z')
-                        b_sub[1] = b_sub[1].Trim('Z');
-                    if (a_sub[0].Length < b_sub[0].Length)
-                        return -1;
-                    else if (a_sub[0].Length > b_sub[0].Length)
-                        return 1;
-                    else if (a_sub[0] != b_sub[0])
-                        return a_sub[0].CompareTo(b_sub[0]);
-                    else
-                    {
-                        if (a_sub[1].Length < b_sub[1].Length)
-                            return -1;
-                        else if (a_sub[1].Length > b_sub[1].Length)
-                            return 1;
-                        else
-                            return a_sub[1].CompareTo(b_sub[1]);
-                    }
-                });
-            }
-            else
-            {
-                subsets.Sort((a, b) =>
-                {
-                    if (a.Item1.Count < b.Item1.Count)
-                        return -1;
-                    else if (a.Item1.Count > b.Item1.Count)
-                        return 1;
-                    else
-                        return a.Item1._setPrimeFormName.CompareTo(b.Item1._setPrimeFormName);
-                });
-            }
+                if (a.Item1.Count < b.Item1.Count)
+                    return -1;
+                else if (a.Item1.Count > b.Item1.Count)
+                    return 1;
+                else
+                    return a.Item1._setPrimeFormName.CompareTo(b.Item1._setPrimeFormName);
+            });
 
             return subsets;
-        }
-
-        /// <summary>
-        /// A helper for GetSubsets
-        /// </summary>
-        /// <param name="store">The list to store completed subsets</param>
-        /// <param name="build">The current subset we are building</param>
-        /// <param name="remaining">The remaining pitch classes from which to choose</param>
-        /// <param name="selected">The number of pitch classes already chosen</param>
-        /// <param name="max">The maximum number of pitch classes to choose</param>
-        private void GetSubsetsHelper(List<HashSet<PitchClass>> store, HashSet<PitchClass> build, List<PitchClass> remaining, int selected, int max)
-        {
-            if (selected == max)
-                store.Add(build);
-            else
-            {
-                for (int i = 0; i <= remaining.Count - max + selected; i++)
-                {
-                    HashSet<PitchClass> newBuild = new HashSet<PitchClass>(build);
-                    List<PitchClass> newRemaining = new List<PitchClass>(remaining);
-                    newBuild.Add(new PitchClass(newRemaining[i]));
-                    newRemaining.RemoveRange(0, i + 1);
-                    GetSubsetsHelper(store, newBuild, newRemaining, selected + 1, max);
-                }
-            }
-        }
-
-        /// <summary>
-        /// Gets the Z-related set-class
-        /// </summary>
-        /// <returns>The Z-related set-class</returns>
-        public PcSetClass GetZRelation()
-        {
-            PcSetClass zSet = new PcSetClass(this);
-            if (_setForteName.Contains('Z'))
-            {
-                zSet.LoadFromForteName(_zTable[_setForteName]);
-            }
-
-            else
-                throw new KeyNotFoundException("No Z-relation exists for this set-class.");
-
-            return zSet;
         }
 
         /// <summary>
@@ -652,9 +458,9 @@ namespace MusicTheory
         /// </summary>
         /// <param name="numberOfTranspositions">The number of transpositions</param>
         /// <returns>An inverted and transposed version of the prime form</returns>
-        public HashSet<PitchClass> InvertTranspose(int numberOfTranspositions)
+        public HashSet<PitchClass24> InvertTranspose(int numberOfTranspositions)
         {
-            HashSet<PitchClass> invertTranspose = PcSet.Transpose(PcSet.Invert(_pitchSet), numberOfTranspositions);
+            HashSet<PitchClass24> invertTranspose = PcSet.Transpose(PcSet.Invert(_pitchSet), numberOfTranspositions);
             return invertTranspose;
         }
 
@@ -697,7 +503,7 @@ namespace MusicTheory
         /// </summary>
         /// <param name="pitches">The list of pitch classes to analyze</param>
         /// <returns>True if the list is a valid pcset; False otherwise</returns>
-        public static bool IsValidSet(List<PitchClass> pitches)
+        public static bool IsValidSet(List<PitchClass24> pitches)
         {
             bool validSet = true;  // Whether or not the pcset is valid
             Dictionary<int, char> usedPitches = new Dictionary<int, char>();  // A list of used pitches
@@ -711,7 +517,7 @@ namespace MusicTheory
             else
             {
                 // Cycle through the pitch list to make sure there are no duplicate pitch classes
-                foreach (PitchClass i in pitches)
+                foreach (PitchClass24 i in pitches)
                 {
                     // If the current pitch class is not a duplicate, add it to the list of used pitches.
                     if (!usedPitches.ContainsKey(i.PitchClassInteger))
@@ -737,25 +543,18 @@ namespace MusicTheory
         {
             name = name.ToUpper();
 
-            // The name must be between 1 and 14 characters
-            if (name.Length < 1 || name.Length > 14)
+            // The name must be between 2 and 96 characters
+            if (name.Length < 2 || name.Length > 96)
                 return false;
 
             if (name == "null" || name == "NULL")
                 return true;
 
-            // If there is a '-' in the name, it must be a Forte name
-            else if (name.Contains('-'))
-            {
-                if (_forteToSetNames.ContainsKey(name))
-                    return true;
-                else
-                    return false;
-            }
-
             // Otherwise, it must be an integer name
             else
             {
+                HashSet<PitchClass24> pcset = new HashSet<PitchClass24>();
+
                 // We permit enclosing brackets or parentheses
                 if ((name[0] == '[' && name[name.Length - 1] == ']') || (name[0] == '(' && name[name.Length - 1] == ')'))
                 {
@@ -763,8 +562,10 @@ namespace MusicTheory
                     name.Remove(0, 1);
                 }
 
-                // Look up the set name in the table. Allow right or left packing.
-                if (_setToForteNames.ContainsKey(name) || _setToForteNamesLeft.ContainsKey(name))
+                // Validate the pcset
+                foreach (string str in name.Split(", "))
+                    pcset.Add(new PitchClass24(System.Int32.Parse(str)));
+                if (CalculatePrimeForm(pcset) == pcset)
                     return true;
                 else
                     return false;
@@ -772,32 +573,19 @@ namespace MusicTheory
         }
 
         /// <summary>
-        /// Loads a set-class from a Forte name. If the name is invalid, no changes are made to the set.
-        /// </summary>
-        /// <param name="forteName">The Forte name</param>
-        public void LoadFromForteName(string forteName)
-        {
-            forteName = forteName.ToUpper();
-            if (!_packFromRight && _forteToSetNamesLeft.ContainsKey(forteName))
-                LoadFromPrimeFormName(_forteToSetNamesLeft[forteName]);
-            else if (_forteToSetNames.ContainsKey(forteName))
-                LoadFromPrimeFormName(_forteToSetNames[forteName]);
-        }
-
-        /// <summary>
         /// Loads the set from a pitch class list. Note that this does not perform validation
         /// on the pitch class list! If you want to validate the list, you will have to call
         /// IsValidSet() first.
         /// </summary>
-        /// <param name="pitchClassList">The pitch class list to load</param>
-        public void LoadFromPitchClassList(List<PitchClass> pitchClassList) => LoadFromPitchClassSet(PcSeg.ToPcSet(pitchClassList));
+        /// <param name="PitchClassList">The pitch class list to load</param>
+        public void LoadFromPitchClassList(List<PitchClass24> PitchClassList) => LoadFromPitchClassSet(PcSeg.ToPcSet(PitchClassList));
 
         /// <summary>
         /// Loads the set from a pcset. No validation is necessary because the HashSet
         /// type does not allow duplicates.
         /// </summary>
         /// <param name="pcset">A pcset</param>
-        public void LoadFromPitchClassSet(HashSet<PitchClass> pcset)
+        public void LoadFromPitchClassSet(HashSet<PitchClass24> pcset)
         {
             // Only one set-class exists for sets of cardinality 0, 11, and 12.
             // No further calculation is necessary.
@@ -807,14 +595,14 @@ namespace MusicTheory
             {
                 _pitchSet.Clear();
                 for (int i = 0; i < 11; i++)
-                    _pitchSet.Add(new PitchClass(i));
+                    _pitchSet.Add(new PitchClass24(i));
                 UpdateSetNames();
             }
             else if (pcset.Count == 12)
             {
                 _pitchSet.Clear();
                 for (int i = 0; i < 12; i++)
-                    _pitchSet.Add(new PitchClass(i));
+                    _pitchSet.Add(new PitchClass24(i));
                 UpdateSetNames();
             }
 
@@ -832,12 +620,12 @@ namespace MusicTheory
         /// <param name="primeFormName">The prime form name</param>
         public void LoadFromPrimeFormName(string primeFormName)
         {
-            HashSet<PitchClass> pitches = new HashSet<PitchClass>();
+            HashSet<PitchClass24> pitches = new HashSet<PitchClass24>();
             primeFormName = primeFormName.ToUpper();
             if (IsValidName(primeFormName))
             {
                 foreach (char letter in primeFormName)
-                    pitches.Add(new PitchClass(letter));
+                    pitches.Add(new PitchClass24(letter));
                 LoadFromPitchClassSet(pitches);
             }
         }
@@ -846,15 +634,14 @@ namespace MusicTheory
         /// Loads a set-class from an existing set-class
         /// </summary>
         /// <param name="sc">The existing PcSetClass</param>
-        public void LoadFromSet(PcSetClass sc)
+        public void LoadFromSet(PcSetClass24 sc)
         {
             _pitchSet.Clear();
             _setPrimeFormName = sc._setPrimeFormName;
-            _setForteName = sc._setForteName;
             _setIcVectorName = sc._setIcVectorName;
             _setType = sc._setType;
-            foreach (PitchClass pc in sc._pitchSet)
-                _pitchSet.Add(new PitchClass(pc));
+            foreach (PitchClass24 pc in sc._pitchSet)
+                _pitchSet.Add(new PitchClass24(pc));
             for (int i = 0; i < sc._setIcVector.Length; i++)
                 _setIcVector[i] = sc._setIcVector[i];
         }
@@ -867,8 +654,6 @@ namespace MusicTheory
             _pitchSet.Clear();
             _setType = "Null Set";
             _setPrimeFormName = "null";
-            _setForteName = "null";
-            _setCarterName = 0;
             _setIcVectorName = "[0000000]";
             for (int i = 0; i < _setIcVector.Length; i++)
                 _setIcVector[i] = 0;
@@ -880,10 +665,10 @@ namespace MusicTheory
         /// </summary>
         /// <param name="transformationName">The transformation name</param>
         /// <returns>A transformed version of the set-class</returns>
-        public HashSet<PitchClass> Transform(string transformationString)
+        public HashSet<PitchClass24> Transform(string transformationString)
         {
             List<Pair<char, int>> opList = new List<Pair<char, int>>();
-            HashSet<PitchClass> pcList = _pitchSet;
+            HashSet<PitchClass24> pcList = _pitchSet;
             int numCount = 0;
             char[] VALID_OPS = new char[3] { 'T', 'I', 'M' };
             opList.Add(new Pair<char, int>('0', 0));
@@ -928,9 +713,9 @@ namespace MusicTheory
         /// </summary>
         /// <param name="numberOfTranspositions">The number of transpositions</param>
         /// <returns>A transposed version of the prime form</returns>
-        public HashSet<PitchClass> Transpose(int numberOfTranspositions)
+        public HashSet<PitchClass24> Transpose(int numberOfTranspositions)
         {
-            HashSet<PitchClass> transposed = PcSet.Transpose(_pitchSet, numberOfTranspositions);
+            HashSet<PitchClass24> transposed = PcSet.Transpose(_pitchSet, numberOfTranspositions);
             return transposed;
         }
 
@@ -940,7 +725,7 @@ namespace MusicTheory
         /// <param name="set1">A set-class</param>
         /// <param name="set2">A set-class</param>
         /// <returns>True if the two set-classes are equal; false otherwise</returns>
-        public static bool operator ==(PcSetClass set1, PcSetClass set2)
+        public static bool operator ==(PcSetClass24 set1, PcSetClass24 set2)
         {
             if (set1 is null)
             {
@@ -966,27 +751,27 @@ namespace MusicTheory
         /// <param name="set1">A set-class</param>
         /// <param name="set2">A set-class</param>
         /// <returns>True if the two set-classes are inequal; false otherwise</returns>
-        public static bool operator !=(PcSetClass set1, PcSetClass set2) => !(set1 == set2);
+        public static bool operator !=(PcSetClass24 set1, PcSetClass24 set2) => !(set1 == set2);
 
         /// <summary>
         /// Calculates the prime form of a provided set of pitch classes
         /// </summary>
-        /// <param name="pitchClassList">The pitch class list to evaluate</param>
+        /// <param name="PitchClassList">The pitch class list to evaluate</param>
         /// <returns>The prime form of the set-class</returns>
-        private HashSet<PitchClass> CalculatePrimeForm(HashSet<PitchClass> pitchClassList)
+        private HashSet<PitchClass24> CalculatePrimeForm(HashSet<PitchClass24> PitchClassList)
         {
-            List<List<PitchClass>> listsToWeight = new List<List<PitchClass>>(2 * pitchClassList.Count);
-            List<PitchClass> pitchClasses = PcSet.ToPcSeg(pitchClassList);
-            List<PitchClass> inverted = PcSeg.Invert(pitchClasses);
+            List<List<PitchClass24>> listsToWeight = new List<List<PitchClass24>>(2 * PitchClassList.Count);
+            List<PitchClass24> PitchClasses = PcSet.ToPcSeg(PitchClassList);
+            List<PitchClass24> inverted = PcSeg.Invert(PitchClasses);
 
             // Add regular forms to the lists to weight
-            for (int i = 0; i < pitchClassList.Count; i++)
+            for (int i = 0; i < PitchClassList.Count; i++)
             {
-                listsToWeight.Add(new List<PitchClass>(pitchClassList.Count));
-                for (int i2 = i; i2 < pitchClassList.Count; i2++)
-                    listsToWeight[i].Add(new PitchClass(pitchClasses[i2]));
+                listsToWeight.Add(new List<PitchClass24>(PitchClassList.Count));
+                for (int i2 = i; i2 < PitchClassList.Count; i2++)
+                    listsToWeight[i].Add(new PitchClass24(PitchClasses[i2]));
                 for (int i2 = 0; i2 < i; i2++)
-                    listsToWeight[i].Add(new PitchClass(pitchClasses[i2]));
+                    listsToWeight[i].Add(new PitchClass24(PitchClasses[i2]));
                 int initialPitch = listsToWeight[i][0].PitchClassInteger;
                 for (int j = 0; j < listsToWeight[i].Count; j++)
                     listsToWeight[i][j].PitchClassInteger -= initialPitch;
@@ -996,15 +781,15 @@ namespace MusicTheory
             // Add inverted forms to the lists to weight
             for (int i = 0; i < inverted.Count; i++)
             {
-                listsToWeight.Add(new List<PitchClass>(pitchClassList.Count));
+                listsToWeight.Add(new List<PitchClass24>(PitchClassList.Count));
                 for (int i2 = i; i2 < inverted.Count; i2++)
-                    listsToWeight[i + pitchClassList.Count].Add(new PitchClass(inverted[i2]));
+                    listsToWeight[i + PitchClassList.Count].Add(new PitchClass24(inverted[i2]));
                 for (int i2 = 0; i2 < i; i2++)
-                    listsToWeight[i + pitchClassList.Count].Add(new PitchClass(inverted[i2]));
-                int initialPitch = listsToWeight[i + pitchClassList.Count][0].PitchClassInteger;
-                for (int j = 0; j < listsToWeight[i + pitchClassList.Count].Count; j++)
-                    listsToWeight[i + pitchClassList.Count][j].PitchClassInteger -= initialPitch;
-                listsToWeight[i + pitchClassList.Count].Sort((a, b) => a.PitchClassInteger.CompareTo(b.PitchClassInteger));
+                    listsToWeight[i + PitchClassList.Count].Add(new PitchClass24(inverted[i2]));
+                int initialPitch = listsToWeight[i + PitchClassList.Count][0].PitchClassInteger;
+                for (int j = 0; j < listsToWeight[i + PitchClassList.Count].Count; j++)
+                    listsToWeight[i + PitchClassList.Count][j].PitchClassInteger -= initialPitch;
+                listsToWeight[i + PitchClassList.Count].Sort((a, b) => a.PitchClassInteger.CompareTo(b.PitchClassInteger));
             }
 
             if (_packFromRight)
@@ -1021,17 +806,13 @@ namespace MusicTheory
             // First clear the existing names
             _setPrimeFormName = "";
             _setIcVectorName = "";
-            _setForteName = "";
             for (int i = 0; i < _setIcVector.Length; i++)
                 _setIcVector[i] = 0;
 
             // Calculate the prime form name by listing all of the pitches in the set
             // (remember, the set must be in prime form at T0 for this to work!)
-            System.Text.StringBuilder name = new System.Text.StringBuilder(NUM_PC);
-            List<PitchClass> pitches = PcSet.ToSortedPcSeg(_pitchSet);
-            foreach (PitchClass pc in pitches)
-                name.Append(pc.PitchClassChar);
-            _setPrimeFormName = name.ToString();
+            List<PitchClass24> pitches = PcSet.ToSortedPcSeg(_pitchSet);
+            _setPrimeFormName = PcSeg.ToString(pitches);
 
             // Get the set interval class vector
             for (int i = 0; i < pitches.Count; i++)
@@ -1089,15 +870,10 @@ namespace MusicTheory
                     break;
             }
 
-            if (!_packFromRight && _setToForteNamesLeft.ContainsKey(_setPrimeFormName))
-                _setForteName = _setToForteNamesLeft[_setPrimeFormName];
-            else
-                _setForteName = _setToForteNames[_setPrimeFormName];
-            if (_pitchSet.Count > 1 && _pitchSet.Count < 11)
-                _setCarterName = int.Parse(_forteToCarterNames[_setForteName]);
-            else
-                _setCarterName = 0;
-            _setIcVectorName = "[" + Functions.HexChars[_setIcVector[0]] + Functions.HexChars[_setIcVector[1]] + Functions.HexChars[_setIcVector[2]] + Functions.HexChars[_setIcVector[3]] + Functions.HexChars[_setIcVector[4]] + Functions.HexChars[_setIcVector[5]] + Functions.HexChars[_setIcVector[6]] + ']';
+            _setIcVectorName = "[";
+            for (int i = 0; i < 12; i++)
+                _setIcVectorName += _setIcVector[i].ToString() + ", ";
+            _setIcVectorName += _setIcVector[12].ToString() + "]";
         }
 
         /// <summary>
@@ -1105,9 +881,9 @@ namespace MusicTheory
         /// </summary>
         /// <param name="listsToWeight">The lists to weight</param>
         /// <returns>A HashSet containing the most weighted form</returns>
-        private HashSet<PitchClass> WeightFromRight(List<List<PitchClass>> listsToWeight)
+        private HashSet<PitchClass24> WeightFromRight(List<List<PitchClass24>> listsToWeight)
         {
-            HashSet<PitchClass> set = new HashSet<PitchClass>();
+            HashSet<PitchClass24> set = new HashSet<PitchClass24>();
             int smallestItem;  // The smallest pitch integer we've found at the current index
             int j;             // The index of the list we are looking at
 
@@ -1116,8 +892,8 @@ namespace MusicTheory
             {
                 if (listsToWeight.Count > 1)
                 {
-                    smallestItem = 11;  // The smallest pitch integer we've found at the current index
-                    
+                    smallestItem = 23;  // The smallest pitch integer we've found at the current index
+
                     // Identify the smallest item at index i
                     for (j = 0; j < listsToWeight.Count; j++)
                     {
@@ -1139,7 +915,7 @@ namespace MusicTheory
                     break;
             }
 
-            foreach (PitchClass pc in listsToWeight[0])
+            foreach (PitchClass24 pc in listsToWeight[0])
                 set.Add(pc);
             return set;
         }
@@ -1149,10 +925,10 @@ namespace MusicTheory
         /// </summary>
         /// <param name="listsToWeight">The lists to weight</param>
         /// <returns>A HashSet containing the most weighted form</returns>
-        private HashSet<PitchClass> WeightLeft(List<List<PitchClass>> listsToWeight)
+        private HashSet<PitchClass24> WeightLeft(List<List<PitchClass24>> listsToWeight)
         {
-            HashSet<PitchClass> set = new HashSet<PitchClass>();
-            int smallestItem = 11;  // The smallest pitch integer we've found at the current index
+            HashSet<PitchClass24> set = new HashSet<PitchClass24>();
+            int smallestItem = 23;  // The smallest pitch integer we've found at the current index
             int j = 0;              // The index of the list we are looking at
             int maxIndex = listsToWeight[0].Count - 1;  // The maximum index to look at
 
@@ -1180,7 +956,7 @@ namespace MusicTheory
                 {
                     if (listsToWeight.Count > 1)
                     {
-                        smallestItem = 11;
+                        smallestItem = 23;
 
                         // Identify the smallest item at index i
                         for (j = 0; j < listsToWeight.Count; j++)
@@ -1204,7 +980,7 @@ namespace MusicTheory
                 }
             }
 
-            foreach (PitchClass pc in listsToWeight[0])
+            foreach (PitchClass24 pc in listsToWeight[0])
                 set.Add(pc);
             return set;
         }

@@ -223,11 +223,10 @@ namespace MusicTheory
         public static List<Pitch> Rotate(List<Pitch> pseg, int i)
         {
             List<Pitch> newList = new List<Pitch>(pseg.Capacity);
-            i %= 12;
             if (i < 0)
-                i += 12;
+                i = ((i % pseg.Count) + pseg.Count) % pseg.Count;
             for (int j = 0; j < pseg.Count; j++)
-                newList.Add(pseg[(j + i) % pseg.Count]);
+                newList.Add(pseg[(j - i + pseg.Count) % pseg.Count]);
             return newList;
         }
 
@@ -285,6 +284,19 @@ namespace MusicTheory
                     SubsegsHelper(store, newBuild, newRemaining, selected + 1, max);
                 }
             }
+        }
+
+        /// <summary>
+        /// Converts a pitch list to an integer list
+        /// </summary>
+        /// <param name="list">The list</param>
+        /// <returns>An integer list</returns>
+        public static List<int> ToIntList(List<Pitch> list)
+        {
+            List<int> newList = new List<int>();
+            foreach (Pitch p in list)
+                newList.Add(p.PitchNum);
+            return newList;
         }
 
         /// <summary>

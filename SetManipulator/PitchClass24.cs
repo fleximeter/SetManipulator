@@ -29,20 +29,20 @@ namespace MusicTheory
     /// <summary>
     /// Indicates a preference for notating accidentals with sharps or flats
     /// </summary>
-    public enum AccidentalPreference
+    public enum AccidentalPreference24
     {
         Flat,
         Sharp
     }
 
     /// <summary>
-    /// Represents a single pitch class and the operations that can be performed on it
+    /// Represents a single microtonal pitch class and the operations that can be performed on it
     /// </summary>
-    public class PitchClass : System.IComparable
+    public class PitchClass24 : System.IComparable
     {
-        // The pitch class in integer notation (0-11)
+        // The pitch class in integer notation (0-23)
         protected int _pitchClassInteger = 0;
-        protected const int NUM_PC = 12;
+        protected const int NUM_PC = 24;
 
         /// <summary>
         /// The pitch class integer. Setting is mod 12.
@@ -52,25 +52,6 @@ namespace MusicTheory
             get { return _pitchClassInteger; }
             set { UpdatePitchClass(value); }
         }
-
-        /// <summary>
-        /// The pitch class as a character. 10 is A and 11 is B.
-        /// </summary>
-        public char PitchClassChar
-        {
-            get { return Functions.HexChars[_pitchClassInteger]; }
-            set
-            {
-                if (value == 'A' || value == 'a')
-                    UpdatePitchClass(10);
-                else if (value == 'B' || value == 'b')
-                    UpdatePitchClass(11);
-                else
-                    UpdatePitchClass(value - '0');
-            }
-        }
-
-
 
         /// <summary>
         /// The pitch class as a string.
@@ -93,34 +74,26 @@ namespace MusicTheory
         /// <summary>
         /// Creates a new PitchClass
         /// </summary>
-        public PitchClass() { }
+        public PitchClass24() { }
 
         /// <summary>
         /// Creates a new PitchClass
         /// </summary>
         /// <param name="pitch">A pitch class to use</param>
-        public PitchClass(int pitch) { UpdatePitchClass(pitch); }
+        public PitchClass24(int pitch) { UpdatePitchClass(pitch); }
 
         /// <summary>
         /// Creates a new PitchClass
         /// </summary>
         /// <param name="pitch">The pitch class, as a character</param>
-        public PitchClass(char pitch)
-        {
-            if (pitch == 'A' || pitch == 'a')
-                UpdatePitchClass(10);
-            else if (pitch == 'B' || pitch == 'b')
-                UpdatePitchClass(11);
-            else
-                UpdatePitchClass(pitch - '0');
-        }
-        
+        public PitchClass24(string pitch) { UpdatePitchClass(System.Int32.Parse(pitch)); }
+
         /// <summary>
         /// Creates a new PitchClass
         /// </summary>
         /// <param name="pitchClass">A PitchClass to copy</param>
-        public PitchClass(PitchClass pitchClass) { _pitchClassInteger = pitchClass.PitchClassInteger; }
-
+        public PitchClass24(PitchClass24 pitchClass) { _pitchClassInteger = pitchClass.PitchClassInteger; }
+        
         /// <summary>
         /// Allows sorting
         /// </summary>
@@ -130,7 +103,7 @@ namespace MusicTheory
         {
             if (obj == null)
                 return 1;
-            PitchClass pc = obj as PitchClass;
+            PitchClass24 pc = obj as PitchClass24;
             return _pitchClassInteger.CompareTo(pc._pitchClassInteger);
         }
 
@@ -139,37 +112,20 @@ namespace MusicTheory
         /// </summary>
         /// <param name="obj">The object to compare</param>
         /// <returns>True if the two objects are equal; false otherwise</returns>
-        public override bool Equals(object obj) => Equals(obj as PitchClass);
+        public override bool Equals(object obj) => Equals(obj as PitchClass24);
 
         /// <summary>
         /// Compares two PitchClasses
         /// </summary>
         /// <param name="pc">The PitchClass to compare</param>
         /// <returns>True if the two PitchClasses are equal; false otherwise</returns>
-        public bool Equals(PitchClass pc)
+        public bool Equals(PitchClass24 pc)
         {
             if (pc is null)
                 return false;
             else if (ReferenceEquals(this, pc))
                 return true;
             else if (_pitchClassInteger == pc.PitchClassInteger)
-                return true;
-            else
-                return false;
-        }
-
-        /// <summary>
-        /// Determines if a character is a valid pitch class character
-        /// </summary>
-        /// <param name="c">The character</param>
-        /// <returns>True if it is valid; false otherwise</returns>
-        public static bool IsValidPitchClassChar(char c)
-        {
-            if (c >= '0' && c <= '9')
-                return true;
-            else if (c == 'A' || c == 'a')
-                return true;
-            else if (c == 'B' || c == 'b')
                 return true;
             else
                 return false;
@@ -207,7 +163,7 @@ namespace MusicTheory
             else
                 return Functions.NoteNamesSharp[_pitchClassInteger];
         }
-        
+
         /// <summary>
         /// Updates the pitch class mod 12
         /// </summary>
@@ -229,7 +185,7 @@ namespace MusicTheory
         /// <param name="val">An integer value to add to the pitch class</param>
         /// <returns>A new pitch class, consisting of the original pitch class 
         /// added to the value, mod 12</returns>
-        public static PitchClass operator +(PitchClass pitch, int val) => new PitchClass(pitch.PitchClassInteger + val);
+        public static PitchClass24 operator +(PitchClass24 pitch, int val) => new PitchClass24(pitch.PitchClassInteger + val);
 
         /// <summary>
         /// Operator for pitch class addition
@@ -238,7 +194,7 @@ namespace MusicTheory
         /// <param name="pitch2">A pitch class that will be added to the first pitch class</param>
         /// <returns>A new pitch class, consisting of pitch class 2 added to pitch class 1,
         /// mod 12</returns>
-        public static PitchClass operator +(PitchClass pitch1, PitchClass pitch2) => new PitchClass(pitch1.PitchClassInteger + pitch2.PitchClassInteger);
+        public static PitchClass24 operator +(PitchClass24 pitch1, PitchClass24 pitch2) => new PitchClass24(pitch1.PitchClassInteger + pitch2.PitchClassInteger);
 
         /// <summary>
         /// Operator for pitch class subtraction
@@ -247,7 +203,7 @@ namespace MusicTheory
         /// <param name="val">An integer value to subtract from the pitch class</param>
         /// <returns>A new pitch class, consisting of the original pitch class 
         /// minus val, mod 12</returns>
-        public static PitchClass operator -(PitchClass pitch, int val) => new PitchClass(pitch.PitchClassInteger - val);
+        public static PitchClass24 operator -(PitchClass24 pitch, int val) => new PitchClass24(pitch.PitchClassInteger - val);
 
         /// <summary>
         /// Operator for pitch class subtraction
@@ -256,7 +212,7 @@ namespace MusicTheory
         /// <param name="pitch2">A pitch class to subtract from the first pitch class</param>
         /// <returns>A new pitch class, consisting of the first pitch class
         /// minus the second pitch class, mod 12</returns>
-        public static PitchClass operator -(PitchClass pitch1, PitchClass pitch2) => new PitchClass(pitch1.PitchClassInteger - pitch2.PitchClassInteger);
+        public static PitchClass24 operator -(PitchClass24 pitch1, PitchClass24 pitch2) => new PitchClass24(pitch1.PitchClassInteger - pitch2.PitchClassInteger);
 
         /// <summary>
         /// Operator for pitch class multiplication
@@ -265,7 +221,7 @@ namespace MusicTheory
         /// <param name="val">The multiplier</param>
         /// <returns>A new pitch class, consisting of the original pitch class 
         /// multiplied by val, mod 12</returns>
-        public static PitchClass operator *(PitchClass pitch, int val) => new PitchClass(pitch.PitchClassInteger * val);
+        public static PitchClass24 operator *(PitchClass24 pitch, int val) => new PitchClass24(pitch.PitchClassInteger * val);
 
         /// <summary>
         /// Operator for pitch class multiplication
@@ -274,7 +230,7 @@ namespace MusicTheory
         /// <param name="pitch2">A pitch class that will be a multiplier</param>
         /// <returns>A new pitch class, consisting of the original pitch class 
         /// multiplied by the second pitch class</returns>
-        public static PitchClass operator *(PitchClass pitch1, PitchClass pitch2) => new PitchClass(pitch1.PitchClassInteger * pitch2.PitchClassInteger);
+        public static PitchClass24 operator *(PitchClass24 pitch1, PitchClass24 pitch2) => new PitchClass24(pitch1.PitchClassInteger * pitch2.PitchClassInteger);
 
         /// <summary>
         /// Operator for pitch class division
@@ -283,7 +239,7 @@ namespace MusicTheory
         /// <param name="val">The divisor</param>
         /// <returns>A new pitch class, consisting of the original pitch class
         /// divided by val</returns>
-        public static PitchClass operator /(PitchClass pitch, int val) => new PitchClass(pitch.PitchClassInteger / val);
+        public static PitchClass24 operator /(PitchClass24 pitch, int val) => new PitchClass24(pitch.PitchClassInteger / val);
 
         /// <summary>
         /// Operator for pitch class division
@@ -292,7 +248,7 @@ namespace MusicTheory
         /// <param name="pitch2">A pitch class that will serve as the divisor</param>
         /// <returns>A new pitch class, consisting of the original pitch class
         /// divided by the second pitch class</returns>
-        public static PitchClass operator /(PitchClass pitch1, PitchClass pitch2) => new PitchClass(pitch1.PitchClassInteger / pitch2.PitchClassInteger);
+        public static PitchClass24 operator /(PitchClass24 pitch1, PitchClass24 pitch2) => new PitchClass24(pitch1.PitchClassInteger / pitch2.PitchClassInteger);
 
         /// <summary>
         /// Greater than operator for pitch class comparison
@@ -300,7 +256,7 @@ namespace MusicTheory
         /// <param name="pitch1">The pitch that should be greater</param>
         /// <param name="pitch2">The pitch that should be less</param>
         /// <returns>True if pitch 1 is greater than pitch 2; false otherwise</returns>
-        public static bool operator >(PitchClass pitch1, PitchClass pitch2)
+        public static bool operator >(PitchClass24 pitch1, PitchClass24 pitch2)
         {
             if (pitch1.PitchClassInteger > pitch2.PitchClassInteger)
                 return true;
@@ -313,7 +269,7 @@ namespace MusicTheory
         /// <param name="pitch1">The pitch that should be greater</param>
         /// <param name="pitch2">The pitch that should be less</param>
         /// <returns>True if pitch 1 is greater than or equal to pitch 2; false otherwise</returns>
-        public static bool operator >=(PitchClass pitch1, PitchClass pitch2)
+        public static bool operator >=(PitchClass24 pitch1, PitchClass24 pitch2)
         {
             if (pitch1.PitchClassInteger >= pitch2.PitchClassInteger)
                 return true;
@@ -327,7 +283,7 @@ namespace MusicTheory
         /// <param name="pitch1">The pitch that should be less</param>
         /// <param name="pitch2">The pitch that should be greater</param>
         /// <returns>True if pitch 1 is less than pitch 2; false otherwise</returns>
-        public static bool operator <(PitchClass pitch1, PitchClass pitch2)
+        public static bool operator <(PitchClass24 pitch1, PitchClass24 pitch2)
         {
             if (pitch1.PitchClassInteger < pitch2.PitchClassInteger)
                 return true;
@@ -341,7 +297,7 @@ namespace MusicTheory
         /// <param name="pitch1">The pitch that should be less</param>
         /// <param name="pitch2">The pitch that should be greater</param>
         /// <returns>True if pitch 1 is less than or equal to pitch 2; false otherwise</returns>
-        public static bool operator <=(PitchClass pitch1, PitchClass pitch2)
+        public static bool operator <=(PitchClass24 pitch1, PitchClass24 pitch2)
         {
             if (pitch1.PitchClassInteger <= pitch2.PitchClassInteger)
                 return true;
@@ -355,7 +311,7 @@ namespace MusicTheory
         /// <param name="pc1">Pitch class 1</param>
         /// <param name="pc2">Pitch class 2</param>
         /// <returns>True if the pitch classes are equal; false otherwise</returns>
-        public static bool operator ==(PitchClass pc1, PitchClass pc2)
+        public static bool operator ==(PitchClass24 pc1, PitchClass24 pc2)
         {
             if (pc1 is null)
             {
@@ -372,6 +328,6 @@ namespace MusicTheory
         /// <param name="pc1">Pitch class 1</param>
         /// <param name="pc2">Pitch class 2</param>
         /// <returns>True if the pitch classes are equal; false otherwise</returns>
-        public static bool operator !=(PitchClass pc1, PitchClass pc2) => !(pc1 == pc2);
+        public static bool operator !=(PitchClass24 pc1, PitchClass24 pc2) => !(pc1 == pc2);
     }
 }

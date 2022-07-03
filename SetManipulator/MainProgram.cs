@@ -40,7 +40,8 @@ namespace SetManipulator
         /// </summary>
         public MainProgram()
         {
-            mt = new MusicTool[5] { new PcSetTool(), new PcSegTool(), new PSetTool(), new PSegTool(), new CSegTool() };
+            mt = new MusicTool[7] { new PcSetTool(), new PcSegTool(), new PSetTool(), new PSegTool(), new CSegTool(), 
+                new PcSet24Tool(), new PcSeg24Tool() };
             mode = 0;
         }
 
@@ -53,7 +54,7 @@ namespace SetManipulator
             bool quit = false;
 
             Console.WriteLine("#################### Set Manipulator #####################");
-            Console.WriteLine("Copyright (c) 2021 by Jeffrey Martin. All rights reserved.");
+            Console.WriteLine("Copyright (c) 2022 by Jeffrey Martin. All rights reserved.");
             Console.WriteLine("https://jeffreymartincomposer.com\n");
             Console.WriteLine("This program is licensed under the GNU GPL v3 and comes");
             Console.WriteLine("with ABSOLUTELY NO WARRANTY. For details, type \"about.\"\n");
@@ -85,14 +86,20 @@ namespace SetManipulator
                     About();
                 else if (cmd1 == "ANGLE")
                     Angle();
+                else if (cmd1 == "BIP")
+                    bip();
                 else if (cmd1 == "CALCULATE" || cmd1 == "CC")
                     Calculate();
                 else if (cmd1 == "COMPLEMENT" || cmd1 == "C")
                     Complement();
                 else if (cmd1 == "CP")
                     ComplementPrime();
+                else if (cmd1 == "DC")
+                    DerivedCore();
                 else if (cmd1 == "ICV")
                     ICV();
+                else if (cmd1 == "IMB")
+                    imb();
                 else if (cmd1 == "INFO" || cmd1 == "N")
                     Info();
                 else if (cmd1 == "INTERSECT" || cmd1 == "IN")
@@ -115,11 +122,13 @@ namespace SetManipulator
                     LoadRandomAIR();
                 else if (cmd1 == "MATRIX" || cmd1 == "MX")
                     Matrix();
+                else if (cmd1 == "OH")
+                    OrderedSearch();
                 else if (cmd1 == "SEARCH" || cmd1 == "H")
                     Search();
                 else if (cmd1 == "SP")
                     SubsetsPrime();
-                else if (cmd1 == "S" && (mode == 0 || mode == 2))
+                else if (cmd1 == "S" && (mode == 0 || mode == 2 || mode == 5))
                     Subsets();
                 else if (cmd1 == "SUBSETS")
                     Subsets();
@@ -129,6 +138,8 @@ namespace SetManipulator
                     Union();
                 else if (cmd1 == "UC")
                     UnionCompact();
+                else if (cmd1 == "VRG")
+                    IsValidRowGen();
                 else if (cmd1 == "Z-RELATION" || cmd1 == "Z")
                     ZRelation();
                 else if (cmd[0][0] == 'T' || cmd[0][0] == 'M' || cmd[0][0] == 'I' || cmd[0][0] == 'R' || cmd[0][0] == 'r')
@@ -144,6 +155,8 @@ namespace SetManipulator
                 string cmd2 = cmd[1].ToUpper();
                 if (cmd1 == "ANGLE")
                     Angle(cmd2);
+                else if (cmd1 == "BIP")
+                    bip(cmd2);
                 else if (cmd1 == "COMPLEMENT")
                 {
                     if (cmd2 == "PRIME")
@@ -151,8 +164,12 @@ namespace SetManipulator
                     else
                         Complement(cmd2);
                 }
+                else if (cmd1 == "DERIVED" && cmd2 == "CORE")
+                    DerivedCore();
                 else if (cmd1 == "ICV")
                     ICV(cmd2);
+                else if (cmd1 == "IMB")
+                    imb(cmd2);
                 else if (cmd1 == "INFO" || cmd1 == "N")
                     Info(cmd2);
                 else if (cmd1 == "INTERSECT" && cmd2 == "MAX")
@@ -186,9 +203,13 @@ namespace SetManipulator
                     Matrix(cmd[1]);
                 else if (cmd1 == "MODE")
                     Mode(cmd[1]);
+                else if (cmd1 == "OH")
+                    OrderedSearch(cmd2);
+                else if (cmd1 == "ORDERED" && cmd2 == "SEARCH")
+                    OrderedSearch();
                 else if (cmd1 == "SEARCH" || cmd1 == "H")
                     Search(cmd2);
-                else if (cmd1 == "S" && (mode == 0 || mode == 2))
+                else if (cmd1 == "S" && (mode == 0 || mode == 2 || mode == 4))
                 {
                     if (cmd2 == "PRIME")
                         SubsetsPrime();
@@ -212,6 +233,8 @@ namespace SetManipulator
                     Union(cmd2);
                 else if (cmd1 == "UC")
                     UnionCompact(cmd2);
+                else if (cmd1 == "VRG")
+                    IsValidRowGen(cmd2);
                 else if (cmd1 == "Z-RELATION" || cmd1 == "Z")
                     ZRelation(cmd2);
                 else if (cmd[0][0] == 'T' || cmd[0][0] == 'M' || cmd[0][0] == 'I' || cmd[0][0] == 'R' || cmd[0][0] == 'r')
@@ -245,6 +268,8 @@ namespace SetManipulator
                 }
                 else if (cmd1 == "MATRIX" || cmd1 == "MX")
                     Matrix(cmd[1], cmd[2]);
+                else if (cmd1 == "ORDERED" && cmd2 == "SEARCH")
+                    OrderedSearch(cmd3);
                 else if (cmd1 == "SUBSETS" && cmd2 == "PRIME")
                     SubsetsPrime(cmd[2]);
                 else if (cmd1 == "UNION" && cmd2 == "COMPACT")
@@ -253,6 +278,8 @@ namespace SetManipulator
                     Union(cmd2, cmd3);
                 else if (cmd1 == "UC")
                     UnionCompact(cmd2, cmd3);
+                else if (cmd1 == "VALIDATE" && cmd2 == "ROW" && cmd3 == "GENERATOR")
+                    IsValidRowGen();
                 else if (cmd[0][0] == 'T' || cmd[0][0] == 'M' || cmd[0][0] == 'I' || cmd[0][0] == 'R' || cmd[0][0] == 'r')
                     Transform(command.Trim());
                 else
@@ -262,10 +289,14 @@ namespace SetManipulator
             {
                 string cmd1 = cmd[0].ToUpper().Trim();
                 string cmd2 = cmd[1].ToUpper().Trim();
+                string cmd3 = cmd[2].ToUpper().Trim();
+                string cmd4 = cmd[3].ToUpper().Trim();
                 if (cmd1 == "INTERSECT" && cmd2 == "MAX")
                     IntersectMax(cmd[2], cmd[3]);
                 else if (cmd1 == "UNION" && cmd2 == "COMPACT")
                     UnionCompact(cmd[2], cmd[3]);
+                else if (cmd1 == "VALIDATE" && cmd2 == "ROW" && cmd3 == "GENERATOR")
+                    IsValidRowGen(cmd4);
                 else if (cmd[0][0] == 'T' || cmd[0][0] == 'M' || cmd[0][0] == 'I' || cmd[0][0] == 'R' || cmd[0][0] == 'r')
                     Transform(command.Trim());
                 else
@@ -287,10 +318,25 @@ namespace SetManipulator
             command = command.ToUpper().Trim();
             if (command == "C")
                 mode = 4;
-            else if (command == "F")
+            else if (command == "F" || command == "FORTE")
                 mt[0].DefaultSetName = PrimarySetName.Forte;
-            else if (command == "N")
+            else if (command == "L")
+                mt[0].PackFromRight = false;
+            else if (command == "N" || command == "PRIME")
                 mt[0].DefaultSetName = PrimarySetName.PrimeForm;
+            else if (command == "O")
+            {
+                if (mode == 0 || mode == 1)
+                    mode = 1;
+                else
+                    mode = 3;
+            }
+            else if (command == "OM")
+                mode = 6;
+            else if (command == "OP")
+                mode = 3;
+            else if (command == "OPC")
+                mode = 1;
             else if (command == "P")
             {
                 if (mode == 0 || mode == 2)
@@ -305,13 +351,8 @@ namespace SetManipulator
                 else
                     mode = 1;
             }
-            else if (command == "O")
-            {
-                if (mode == 0 || mode == 1)
-                    mode = 1;
-                else
-                    mode = 3;
-            }
+            else if (command == "R")
+                mt[0].PackFromRight = true;
             else if (command == "U")
             {
                 if (mode == 0 || mode == 1)
@@ -319,6 +360,12 @@ namespace SetManipulator
                 else
                     mode = 2;
             }
+            else if (command == "UM")
+                mode = 5;
+            else if (command == "UP")
+                mode = 2;
+            else if (command == "UPC")
+                mode = 0;
             else
                 Console.WriteLine("Invalid command. For a list of commands, enter ?.\n");
         }
@@ -341,6 +388,8 @@ namespace SetManipulator
 
         void Angle(string command1 = "", string command2 = "") => mt[mode].Angle(command1, command2);
 
+        void bip(string command = "") => mt[mode].bip(command);
+
         void Calculate() => mt[mode].Calculate();
 
         void Complement(string command = "") => mt[mode].Complement(command);
@@ -351,7 +400,11 @@ namespace SetManipulator
 
         void ComplexKh(string command = "") => mt[mode].ComplexKh(command);
 
+        void DerivedCore() => mt[mode].DerivedCore();
+
         void ICV(string command = "") => mt[mode].ICV(command);
+
+        void imb(string command = "") => mt[mode].imb(command);
 
         void Info(string command = "") => mt[mode].Info(command);
 
@@ -360,6 +413,8 @@ namespace SetManipulator
         void IntersectMax(string command1 = "", string command2 = "") => mt[mode].IntersectMax(command1, command2);
 
         void Intervals(string command = "") => mt[mode].Intervals(command);
+
+        void IsValidRowGen(string command = "") => mt[mode].IsValidRowGen(command);
 
         void Load(string command = "") => mt[mode].Load(command);
 
@@ -370,6 +425,8 @@ namespace SetManipulator
         void LoadRandomAIR() => mt[mode].LoadRandomAIR();
 
         void Matrix(string command1 = "", string command2 = "") => mt[mode].Matrix(command1, command2);
+
+        void OrderedSearch(string command = "") => mt[mode].OrderedSearch(command);
 
         void Search(string command = "") => mt[mode].Search(command);
 

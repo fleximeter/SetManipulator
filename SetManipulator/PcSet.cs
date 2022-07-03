@@ -48,6 +48,19 @@ namespace MusicTheory
         }
 
         /// <summary>
+        /// Copies a pcset
+        /// </summary>
+        /// <param name="set">A pcset</param>
+        /// <returns>A copy of the pcset</returns>
+        public static HashSet<PitchClass24> Copy(HashSet<PitchClass24> set)
+        {
+            HashSet<PitchClass24> copy = new HashSet<PitchClass24>();
+            foreach (PitchClass24 pc in set)
+                copy.Add(new PitchClass24(pc));
+            return copy;
+        }
+
+        /// <summary>
         /// Gets a collection of secondary forms that contain a provided collection of pitches
         /// </summary>
         /// <param name="pitchClasses">The pitch classes to search for</param>
@@ -96,6 +109,54 @@ namespace MusicTheory
         }
 
         /// <summary>
+        /// Gets a collection of secondary forms that contain a provided collection of pitches
+        /// </summary>
+        /// <param name="pitchClasses">The pitch classes to search for</param>
+        /// <returns>The secondary forms</returns>
+        public static List<Pair<string, HashSet<PitchClass24>>> GetSecondaryForms(HashSet<PitchClass24> pcset, List<PitchClass24> pitchClasses)
+        {
+            List<Pair<string, HashSet<PitchClass24>>> secondaryForms = new List<Pair<string, HashSet<PitchClass24>>>();
+
+            if (pitchClasses.Count <= pcset.Count)
+            {
+                for (int i = 0; i < 24; i++)
+                {
+                    HashSet<PitchClass24> transpose = Transpose(pcset, i);
+                    HashSet<PitchClass24> invert = Transpose(Invert(pcset), i);
+                    bool isTranspose = true;
+                    bool isInvert = true;
+
+                    foreach (PitchClass24 pc in pitchClasses)
+                    {
+                        if (!transpose.Contains(pc))
+                        {
+                            isTranspose = false;
+                            break;
+                        }
+                    }
+                    foreach (PitchClass24 pc in pitchClasses)
+                    {
+                        if (!invert.Contains(pc))
+                        {
+                            isInvert = false;
+                            break;
+                        }
+                    }
+
+                    if (isTranspose)
+                        secondaryForms.Add(new Pair<string, HashSet<PitchClass24>>('T' + i.ToString(), transpose));
+                    if (isInvert)
+                        secondaryForms.Add(new Pair<string, HashSet<PitchClass24>>('T' + i.ToString() + 'I', invert));
+                }
+            }
+
+            else
+                throw new System.ArgumentOutOfRangeException("The provided list of pitch classes is too big.");
+
+            return secondaryForms;
+        }
+
+        /// <summary>
         /// Intersects two PcSets
         /// </summary>
         /// <param name="set1">A PcSet</param>
@@ -104,6 +165,19 @@ namespace MusicTheory
         public static HashSet<PitchClass> Intersect(HashSet<PitchClass> set1, HashSet<PitchClass> set2)
         {
             HashSet<PitchClass> pcSet = Copy(set1);
+            pcSet.IntersectWith(set2);
+            return pcSet;
+        }
+
+        /// <summary>
+        /// Intersects two PcSets
+        /// </summary>
+        /// <param name="set1">A PcSet</param>
+        /// <param name="set2">A PcSet</param>
+        /// <returns>A new, intersected pcset</returns>
+        public static HashSet<PitchClass24> Intersect(HashSet<PitchClass24> set1, HashSet<PitchClass24> set2)
+        {
+            HashSet<PitchClass24> pcSet = Copy(set1);
             pcSet.IntersectWith(set2);
             return pcSet;
         }
@@ -139,6 +213,36 @@ namespace MusicTheory
         }
 
         /// <summary>
+        /// Produces the maximum intersection of two pcsets
+        /// </summary>
+        /// <param name="set1">A pcset</param>
+        /// <param name="set2">A pcset</param>
+        /// <returns>The maximum intersection</returns>
+        public static HashSet<PitchClass24> IntersectMax(HashSet<PitchClass24> set1, HashSet<PitchClass24> set2)
+        {
+            HashSet<PitchClass24> intersect = new HashSet<PitchClass24>();
+            int max = 0;
+            for (int i = 0; i < 24; i++)
+            {
+                HashSet<PitchClass24> t = Transpose(set2, i);
+                HashSet<PitchClass24> inv = Transpose(Invert(set2), i);
+                HashSet<PitchClass24> i1 = Intersect(set1, t);
+                HashSet<PitchClass24> i2 = Intersect(set1, inv);
+                if (i1.Count > max)
+                {
+                    max = i1.Count;
+                    intersect = i1;
+                }
+                if (i2.Count > max)
+                {
+                    max = i2.Count;
+                    intersect = i2;
+                }
+            }
+            return intersect;
+        }
+
+        /// <summary>
         /// Inverts a set of pitch classes. This is a TTO.
         /// </summary>
         /// <param name="setToInvert">The set to invert</param>
@@ -148,6 +252,19 @@ namespace MusicTheory
             HashSet<PitchClass> inverted = new HashSet<PitchClass>();
             foreach (PitchClass pc in setToInvert)
                 inverted.Add(new PitchClass(pc.PitchClassInteger * 11));
+            return inverted;
+        }
+
+        /// <summary>
+        /// Inverts a set of pitch classes. This is a TTO.
+        /// </summary>
+        /// <param name="setToInvert">The set to invert</param>
+        /// <returns>The inverted set</returns>
+        public static HashSet<PitchClass24> Invert(HashSet<PitchClass24> setToInvert)
+        {
+            HashSet<PitchClass24> inverted = new HashSet<PitchClass24>();
+            foreach (PitchClass24 pc in setToInvert)
+                inverted.Add(new PitchClass24(pc.PitchClassInteger * 23));
             return inverted;
         }
 
@@ -218,11 +335,77 @@ namespace MusicTheory
         }
 
         /// <summary>
+        /// Multiplies a pitch class set. This is a TTO if the multiplier is 1, 5, 7, or 11 (mod 12).
+        /// </summary>
+        /// <param name="setToMultiply">The set to multiply</param>
+        /// <param name="multiplier">The multiplier (by default, 5). Note that multipliers other than 1, 5, 7, or 11 
+        /// (mod 12) result in epimorphisms.</param>
+        /// <returns>The multiplied set</returns>
+        public static HashSet<PitchClass24> Multiply(HashSet<PitchClass24> setToMultiply, int multiplier = 5)
+        {
+            HashSet<PitchClass24> multiplied = new HashSet<PitchClass24>();
+            foreach (PitchClass24 pc in setToMultiply)
+                multiplied.Add(new PitchClass24(pc.PitchClassInteger * multiplier));
+            return multiplied;
+        }
+
+        /// <summary>
         /// Gets all proper subsets of the current pcset. These are literal subsets.
+        /// Uses the bit vector solution from https://www.geeksforgeeks.org/power-set/
         /// </summary>
         /// <param name="pcset">A pcset</param>
         /// <returns>A list of all proper subsets, excluding the null set</returns>
         public static List<HashSet<PitchClass>> Subsets(HashSet<PitchClass> pcset)
+        {
+            List<HashSet<PitchClass>> subsets = new List<HashSet<PitchClass>>();
+            List<PitchClass> listSet = ToPcSeg(pcset);
+            int size = (int)System.Math.Pow(2, pcset.Count);
+
+            for (int i = 0; i < size; i++)
+            {
+                subsets.Add(new HashSet<PitchClass>());
+                for (int j = 0; j < pcset.Count; j++)
+                {
+                    if ((i & (1 << j)) > 0)
+                        subsets[subsets.Count - 1].Add(listSet[j]);
+                }
+            }
+
+            return subsets;
+        }
+
+        /// <summary>
+        /// Gets all proper subsets of the current pcset. These are literal subsets.
+        /// Uses the bit vector solution from https://www.geeksforgeeks.org/power-set/
+        /// </summary>
+        /// <param name="pcset">A pcset</param>
+        /// <returns>A list of all proper subsets, excluding the null set</returns>
+        public static List<HashSet<PitchClass24>> Subsets(HashSet<PitchClass24> pcset)
+        {
+            List<HashSet<PitchClass24>> subsets = new List<HashSet<PitchClass24>>();
+            List<PitchClass24> listSet = ToPcSeg(pcset);
+            int size = (int)System.Math.Pow(2, pcset.Count);
+
+            for (int i = 0; i < size; i++)
+            {
+                subsets.Add(new HashSet<PitchClass24>());
+                for (int j = 0; j < pcset.Count; j++)
+                {
+                    if ((i & (1 << j)) > 0)
+                        subsets[subsets.Count - 1].Add(listSet[j]);
+                }
+            }
+
+            return subsets;
+        }
+
+        /// <summary>
+        /// Gets all proper subsets of the current pcset. These are literal subsets.
+        /// </summary>
+        /// <param name="pcset">A pcset</param>
+        /// <returns>A list of all proper subsets, excluding the null set</returns>
+        [Obsolete("This method is deprecated.")]
+        private static List<HashSet<PitchClass>> SubsetsOld(HashSet<PitchClass> pcset)
         {
             List<HashSet<PitchClass>> store = new List<HashSet<PitchClass>>();
             HashSet<PitchClass> build = new HashSet<PitchClass>();
@@ -245,6 +428,7 @@ namespace MusicTheory
         /// <param name="remaining">The remaining pitch classes from which to choose</param>
         /// <param name="selected">The number of pitch classes already chosen</param>
         /// <param name="max">The maximum number of pitch classes to choose</param>
+        [Obsolete("This method is deprecated.")]
         private static void SubsetsHelper(List<HashSet<PitchClass>> store, HashSet<PitchClass> build, List<PitchClass> remaining, int selected, int max)
         {
             if (selected == max)
@@ -276,6 +460,19 @@ namespace MusicTheory
         }
 
         /// <summary>
+        /// Converts a pitch-class HashSet to a List
+        /// </summary>
+        /// <param name="set">The HashSet to convert</param>
+        /// <returns>A List</returns>
+        public static List<PitchClass24> ToPcSeg(HashSet<PitchClass24> set)
+        {
+            List<PitchClass24> newList = new List<PitchClass24>();
+            foreach (PitchClass24 pc in set)
+                newList.Add(new PitchClass24(pc));
+            return newList;
+        }
+
+        /// <summary>
         /// Converts a pitch-class HashSet to a sorted List
         /// </summary>
         /// <param name="set">The HashSet to convert</param>
@@ -285,6 +482,20 @@ namespace MusicTheory
             List<PitchClass> newList = new List<PitchClass>();
             foreach (PitchClass pc in set)
                 newList.Add(new PitchClass(pc));
+            newList.Sort((a, b) => a.PitchClassInteger.CompareTo(b.PitchClassInteger));
+            return newList;
+        }
+
+        /// <summary>
+        /// Converts a pitch-class HashSet to a sorted List
+        /// </summary>
+        /// <param name="set">The HashSet to convert</param>
+        /// <returns>A sorted List</returns>
+        public static List<PitchClass24> ToSortedPcSeg(HashSet<PitchClass24> set)
+        {
+            List<PitchClass24> newList = new List<PitchClass24>();
+            foreach (PitchClass24 pc in set)
+                newList.Add(new PitchClass24(pc));
             newList.Sort((a, b) => a.PitchClassInteger.CompareTo(b.PitchClassInteger));
             return newList;
         }
@@ -306,6 +517,22 @@ namespace MusicTheory
         }
 
         /// <summary>
+        /// Converts a pitch-class set to a sorted string
+        /// </summary>
+        /// <param name="set">The set</param>
+        /// <returns>A string</returns>
+        public static string ToString(HashSet<PitchClass24> set, string separator = ", ")
+        {
+            List<PitchClass24> sorted = ToSortedPcSeg(set);
+            System.Text.StringBuilder sb = new System.Text.StringBuilder();
+            for (int i = 0; i < sorted.Count - 1; i++)
+                sb.Append(sorted[i].PitchClassString + separator);
+            if (set.Count > 0)
+                sb.Append(sorted[sorted.Count - 1].PitchClassString);
+            return sb.ToString();
+        }
+
+        /// <summary>
         /// Transposes a set of pitch classes. This is a TTO.
         /// </summary>
         /// <param name="setToTranspose">The set to transpose</param>
@@ -316,6 +543,20 @@ namespace MusicTheory
             HashSet<PitchClass> transposedSet = new HashSet<PitchClass>();
             foreach (PitchClass pc in setToTranspose)
                 transposedSet.Add(new PitchClass(pc.PitchClassInteger + numberOfTranspositions));
+            return transposedSet;
+        }
+
+        /// <summary>
+        /// Transposes a set of pitch classes. This is a TTO.
+        /// </summary>
+        /// <param name="setToTranspose">The set to transpose</param>
+        /// <param name="numberOfTranspositions">The number of transpositions</param>
+        /// <returns>The transposed set</returns>
+        public static HashSet<PitchClass24> Transpose(HashSet<PitchClass24> setToTranspose, int numberOfTranspositions)
+        {
+            HashSet<PitchClass24> transposedSet = new HashSet<PitchClass24>();
+            foreach (PitchClass24 pc in setToTranspose)
+                transposedSet.Add(new PitchClass24(pc.PitchClassInteger + numberOfTranspositions));
             return transposedSet;
         }
 
@@ -371,6 +612,57 @@ namespace MusicTheory
         }
 
         /// <summary>
+        /// Transforms the pitch class set. Note that this function will only behave as expected 
+        /// if valid transformation names are provided - names can be validated using IsValidTransformation().
+        /// </summary>
+        /// <param name="transformationName">The transformation name</param>
+        /// <returns>A transformed version of the set</returns>
+        public static HashSet<PitchClass24> Transform(HashSet<PitchClass24> pcset, string transformationString)
+        {
+            List<Pair<char, int>> opList = new List<Pair<char, int>>();
+            HashSet<PitchClass24> pcList = Copy(pcset);
+            int numCount = 0;
+            char[] VALID_OPS = new char[3] { 'T', 'I', 'M' };
+            opList.Add(new Pair<char, int>('0', 0));
+
+            // Parse the transformation string and separate it into opcodes and numbers
+            for (int i = transformationString.Length - 1; i >= 0; i--)
+            {
+                char c = transformationString[i];
+                if (c >= '0' && c <= '9')
+                {
+                    opList[opList.Count - 1].Item2 += (int)System.Math.Pow(10, numCount) * (c - '0');
+                    numCount++;
+                }
+                else if (c == '-' && i > 0)
+                    opList[opList.Count - 1].Item2 *= -1;
+                else
+                {
+                    if (System.Array.Find(VALID_OPS, (a) => a == c) != -1)
+                    {
+                        opList[opList.Count - 1].Item1 = c;
+                        if (i > 0)
+                            opList.Add(new Pair<char, int>('0', 0));
+                    }
+                    numCount = 0;
+                }
+            }
+
+            // Perform the transformation
+            foreach (Pair<char, int> pair in opList)
+            {
+                if (pair.Item1 == 'T')
+                    pcList = Transpose(pcList, pair.Item2);
+                else if (pair.Item1 == 'I')
+                    pcList = Invert(pcList);
+                else if (pair.Item1 == 'M')
+                    pcList = Multiply(pcList, pair.Item2);
+            }
+
+            return pcList;
+        }
+
+        /// <summary>
         /// Unions two PcSets
         /// </summary>
         /// <param name="set1">A PcSet</param>
@@ -379,6 +671,19 @@ namespace MusicTheory
         public static HashSet<PitchClass> Union(HashSet<PitchClass> set1, HashSet<PitchClass> set2)
         {
             HashSet<PitchClass> pcSet = Copy(set1);
+            pcSet.UnionWith(set2);
+            return pcSet;
+        }
+
+        /// <summary>
+        /// Unions two PcSets
+        /// </summary>
+        /// <param name="set1">A PcSet</param>
+        /// <param name="set2">A PcSet</param>
+        /// <returns>A new, unioned PcSet</returns>
+        public static HashSet<PitchClass24> Union(HashSet<PitchClass24> set1, HashSet<PitchClass24> set2)
+        {
+            HashSet<PitchClass24> pcSet = Copy(set1);
             pcSet.UnionWith(set2);
             return pcSet;
         }
@@ -399,6 +704,36 @@ namespace MusicTheory
                 HashSet<PitchClass> inv = Transpose(Invert(set2), i);
                 HashSet<PitchClass> i1 = Union(set1, t);
                 HashSet<PitchClass> i2 = Union(set1, inv);
+                if (i1.Count < min)
+                {
+                    min = i1.Count;
+                    union = i1;
+                }
+                if (i2.Count < min)
+                {
+                    min = i2.Count;
+                    union = i2;
+                }
+            }
+            return union;
+        }
+
+        /// <summary>
+        /// Produces the most compact union of two pcsets
+        /// </summary>
+        /// <param name="set1">A pcset</param>
+        /// <param name="set2">A pcset</param>
+        /// <returns>The most compact union</returns>
+        public static HashSet<PitchClass24> UnionCompact(HashSet<PitchClass24> set1, HashSet<PitchClass24> set2)
+        {
+            HashSet<PitchClass24> union = new HashSet<PitchClass24>();
+            int min = set1.Count + set2.Count;
+            for (int i = 0; i < 12; i++)
+            {
+                HashSet<PitchClass24> t = Transpose(set2, i);
+                HashSet<PitchClass24> inv = Transpose(Invert(set2), i);
+                HashSet<PitchClass24> i1 = Union(set1, t);
+                HashSet<PitchClass24> i2 = Union(set1, inv);
                 if (i1.Count < min)
                 {
                     min = i1.Count;

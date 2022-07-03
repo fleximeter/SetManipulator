@@ -343,11 +343,10 @@ namespace MusicTheory
         public static List<uint> Rotate(List<uint> cseg, int i)
         {
             List<uint> newList = new List<uint>(cseg.Capacity);
-            i %= 12;
             if (i < 0)
-                i += 12;
+                i = ((i % cseg.Count) + cseg.Count) % cseg.Count;
             for (int j = 0; j < cseg.Count; j++)
-                newList.Add(cseg[(j + i) % cseg.Count]);
+                newList.Add(cseg[(j - i + cseg.Count) % cseg.Count]);
             return newList;
         }
 

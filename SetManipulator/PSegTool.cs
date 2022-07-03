@@ -106,6 +106,28 @@ namespace SetManipulator
             }
         }
 
+        /// <summary>
+        /// Determines if an interval segment is a valid row generator
+        /// </summary>
+        /// <param name="command">A potential interval segment</param>
+        public override void IsValidRowGen(string command = "")
+        {
+            List<int> pc;
+
+            if (command == "")
+            {
+                Console.Write("Enter interval row: ");
+                command = Console.ReadLine();
+            }
+
+            pc = PSeg.ToIntList(PSeg.Parse(command));
+
+            if (PcSeg.IsValidRowGen(pc))
+                Console.WriteLine("Valid row generator");
+            else
+                Console.WriteLine("Bad row generator");
+        }
+
         public override void Search(string command = "")
         {
             //List<Pitch> p;

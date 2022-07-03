@@ -39,6 +39,7 @@ namespace SetManipulator
         List<PitchClass> _intervals;
         RowMatrix _matrix;
         bool _haveRow;
+        Dictionary<string, string>[] _nameTables;
 
         /// <summary>
         /// Initializes the PcSegTool
@@ -50,6 +51,7 @@ namespace SetManipulator
             _matrix = new RowMatrix();
             _intervals = new List<PitchClass>();
             _haveRow = false;
+            _nameTables = Functions.GenerateSetTables();
         }
 
         /// <summary>
@@ -100,6 +102,63 @@ namespace SetManipulator
         }
 
         /// <summary>
+        /// Displays the BIP_n
+        /// </summary>
+        /// <param name="command">The BIP cardinality</param>
+        public override void bip(string command = "")
+        {
+            List<PitchClass> pcseg;
+            if (_haveRow)
+                pcseg = _row[0].GetPcSeg();
+            else
+                pcseg = _pcseg[0];
+            if (command == "")
+            {
+                Console.Write("Enter cardinality n: ");
+                command = Console.ReadLine();
+            }
+
+            List<int> bip = PcSeg.bip_n(PcSeg.imb_n(pcseg, uint.Parse(command), _nameTables));
+
+            Console.Write("BIP_" + command + ": ");
+            for (int i = 0; i < bip.Count - 1; i++)
+                Console.Write(bip[i].ToString() + ", ");
+            if (bip.Count > 0)
+                Console.WriteLine(bip[bip.Count - 1]);
+        }
+
+        /// <summary>
+        /// Displays a list of imbricated set-classes
+        /// </summary>
+        /// <param name="command">The cardinality of the imbricated set-classes</param>
+        public override void imb(string command = "")
+        {
+            List<PitchClass> pcseg;
+            if (_haveRow)
+                pcseg = _row[0].GetPcSeg();
+            else
+                pcseg = _pcseg[0];
+
+            if (command == "")
+            {
+                Console.Write("Enter cardinality n: ");
+                command = Console.ReadLine();
+            }
+
+            uint n = uint.Parse(command);
+            List<PcSetClass> scs = PcSeg.imb_n(pcseg, n, _nameTables);
+
+            for (int i = 0; i < scs.Count; i++)
+            {
+                List<PitchClass> imbn = new List<PitchClass>();
+                for (int j = i; j < i + n; j++)
+                    imbn.Add(pcseg[j]);
+                Console.Write("<" + PcSeg.ToString(imbn, " ") + ">");
+                Console.WriteLine("  |  " + "(" + scs[i].ForteName + ")[" + scs[i].PrimeFormName + "]");
+            }
+        }
+
+        /// <summary>
         /// Displays the interval sequence of a pcseg or row
         /// </summary>
         /// <param name="command">A pcseg</param>
@@ -139,6 +198,28 @@ namespace SetManipulator
                 List<PitchClass> intervals = PcSeg.Intervals(list);
                 Console.WriteLine("Intervals: <" + PcSeg.ToString(intervals, " ") + ">");
             }
+        }
+
+        /// <summary>
+        /// Determines if an interval segment is a valid row generator
+        /// </summary>
+        /// <param name="command">A potential interval segment</param>
+        public override void IsValidRowGen(string command = "")
+        {
+            List<int> pc;
+
+            if (command == "")
+            {
+                Console.Write("Enter interval row: ");
+                command = Console.ReadLine();
+            }
+
+            pc = PcSeg.ToIntList(PcSeg.Parse(command));
+
+            if (PcSeg.IsValidRowGen(pc))
+                Console.WriteLine("Valid row generator");
+            else
+                Console.WriteLine("Bad row generator");
         }
 
         /// <summary>
@@ -255,7 +336,7 @@ namespace SetManipulator
         /// Searches transformations of the current pcseg or row
         /// </summary>
         /// <param name="command"></param>
-        public override void Search(string command = "")
+        public override void OrderedSearch(string command = "")
         {
             List<PitchClass> pc;
             List<Pair<string, List<PitchClass>>> rowForms;
@@ -309,6 +390,63 @@ namespace SetManipulator
         }
 
         /// <summary>
+        /// Searches all Tn and TnI forms of a pcset for a set of pcs
+        /// </summary>
+        /// <param name="command">The search string</param>
+        public override void Search(string command = "")
+        {
+            List<PitchClass> pc;
+            List<Pair<string, List<PitchClass>>> rowForms;
+            if (command == "")
+            {
+                Console.Write("Enter pcs (q to quit)\n> ");
+                command = Console.ReadLine();
+                while (command != "q" && command != "Q")
+                {
+                    pc = PcSeg.Parse(command);
+                    if (pc.Count > 0)
+                    {
+                        if (_haveRow)
+                            rowForms = PcSeg.GetSecondaryFormsUnordered(_row[0].GetPcSeg(), pc);
+                        else
+                            rowForms = PcSeg.GetSecondaryFormsUnordered(_pcseg[0], pc);
+                        foreach (Pair<string, List<PitchClass>> rowForm in rowForms)
+                        {
+                            Console.Write(string.Format("{0,-7}", rowForm.Item1 + ":"));
+                            Console.WriteLine("<" + PcSeg.ToString(rowForm.Item2, " ") + ">");
+                        }
+                        if (rowForms.Count == 0)
+                            Console.WriteLine("No row forms match your search term.");
+                    }
+                    else
+                        Console.WriteLine("Invalid pc string");
+                    Console.Write("Enter pcs (q to quit)\n> ");
+                    command = Console.ReadLine();
+                }
+            }
+            else
+            {
+                pc = PcSeg.Parse(command);
+                if (pc.Count > 0)
+                {
+                    if (_haveRow)
+                        rowForms = PcSeg.GetSecondaryFormsUnordered(_row[0].GetPcSeg(), pc);
+                    else
+                        rowForms = PcSeg.GetSecondaryFormsUnordered(_pcseg[0], pc);
+                    foreach (Pair<string, List<PitchClass>> rowForm in rowForms)
+                    {
+                        Console.Write(string.Format("{0,-7}", rowForm.Item1 + ":"));
+                        Console.WriteLine("<" + PcSeg.ToString(rowForm.Item2, " ") + ">");
+                    }
+                    if (rowForms.Count == 0)
+                        Console.WriteLine("No row forms match your search term.");
+                }
+                else
+                    Console.WriteLine("Invalid pc string");
+            }
+        }
+
+        /// <summary>
         /// Displays all subsegs of a pcseg
         /// </summary>
         /// <param name="command">A pcseg string</param>
@@ -322,6 +460,9 @@ namespace SetManipulator
                     subsegs = PcSeg.Subsegs(_row[0].GetPcSeg());
                 else
                     subsegs = PcSeg.Subsegs(_pcseg[0]);
+
+                subsegs = PcSeg.SortPcsegList(subsegs);
+
                 e = subsegs.GetEnumerator();
                 e.MoveNext();
 
@@ -342,6 +483,8 @@ namespace SetManipulator
                 if (pcs.Count > 0)
                 {
                     subsegs = PcSeg.Subsegs(pcs);
+                    subsegs = PcSeg.SortPcsegList(subsegs);
+
                     e = subsegs.GetEnumerator();
                     e.MoveNext();
 

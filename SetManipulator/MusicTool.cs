@@ -32,27 +32,37 @@ namespace SetManipulator
 {
     class MusicTool
     {
+        public virtual bool PackFromRight
+        {
+            get { return true; }
+            set { ; }
+        }
         public virtual PrimarySetName DefaultSetName
         {
             get { return 0; }
             set { ; }
         }
         public virtual void Angle(string command1 = "", string command2 = "") => Console.WriteLine("This command is not available in the current mode.");
+        public virtual void bip(string command = "") => Console.WriteLine("This command is not available in the current mode.");
         public virtual void Calculate() => Console.WriteLine("This command is not available in the current mode.");
         public virtual void Complement(string command = "") => Console.WriteLine("This command is not available in the current mode.");
         public virtual void ComplementPrime() => Console.WriteLine("This command is not available in the current mode.");
         public virtual void ComplexK(string command = "") => Console.WriteLine("This command is not available in the current mode.");
         public virtual void ComplexKh(string command = "") => Console.WriteLine("This command is not available in the current mode.");
+        public virtual void DerivedCore() => Console.WriteLine("This command is not available in the current mode.");
         public virtual void ICV(string command = "") => Console.WriteLine("This command is not available in the current mode.");
+        public virtual void imb(string command = "") => Console.WriteLine("This command is not available in the current mode.");
         public virtual void Info(string command = "") => Console.WriteLine("This command is not available in the current mode.");
         public virtual void Intersect(string command1 = "", string command2 = "") => Console.WriteLine("This command is not available in the current mode.");
         public virtual void IntersectMax(string command1 = "", string command2 = "") => Console.WriteLine("This command is not available in the current mode.");
         public virtual void Intervals(string command = "") => Console.WriteLine("This command is not available in the current mode.");
+        public virtual void IsValidRowGen(string command = "") => Console.WriteLine("This command is not available in the current mode.");
         public virtual void Load(string command = "") => Console.WriteLine("This command is not available in the current mode.");
         public virtual void LoadPrime(string command = "") => Console.WriteLine("This command is not available in the current mode.");
         public virtual void LoadRandom() => Console.WriteLine("This command is not available in the current mode.");
         public virtual void LoadRandomAIR() => Console.WriteLine("This command is not available in the current mode.");
         public virtual void Matrix(string command1 = "", string command2 = "") => Console.WriteLine("This command is not available in the current mode.");
+        public virtual void OrderedSearch(string command = "") => Console.WriteLine("This command is not available in the current mode.");
         public virtual void Search(string command = "") => Console.WriteLine("This command is not available in the current mode.");
         public virtual void Subsets(string command = "") => Console.WriteLine("This command is not available in the current mode.");
         public virtual void Subsegs(string command = "") => Console.WriteLine("This command is not available in the current mode.");

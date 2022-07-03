@@ -44,12 +44,32 @@ namespace MusicTheory
         CompareForteNames forteComparer;
         ComparePrimeFormNames primeComparer;
         int[] cardinalities;
+        bool packFromRight;
         PrimarySetName preferForteName;
 
         /// <summary>
         /// An array that indicates which cardinalities are present in the set-complex
         /// </summary>
         public int[] Cardinalities { get { return cardinalities; } }
+
+        /// <summary>
+        /// Whether or not to pack from the right
+        /// </summary>
+        public bool PackFromRight
+        {
+            get { return packFromRight; }
+            set {
+                packFromRight = value;
+                if (_nexusSet != null)
+                {
+                    _nexusSet.PackFromRight = value;
+                    if (_complexType == SetComplexType.K)
+                        GenerateComplexK();
+                    else
+                        GenerateComplexKh();
+                }
+            }
+        }
 
         /// <summary>
         /// Whether or not to sort by Forte names (default is false)
@@ -95,6 +115,7 @@ namespace MusicTheory
             cardinalities = new int[13];
             forteComparer = new CompareForteNames();
             primeComparer = new ComparePrimeFormNames();
+            packFromRight = true;
         }
 
         /// <summary>
@@ -107,6 +128,7 @@ namespace MusicTheory
             cardinalities = new int[12];
             forteComparer = new CompareForteNames();
             primeComparer = new ComparePrimeFormNames();
+            packFromRight = true;
             LoadNexusSet(nexusSet, setComplexType);
         }
 
@@ -182,6 +204,7 @@ namespace MusicTheory
                 else
                     _complex = new SortedDictionary<string, PcSetClass>(primeComparer);
                 _nexusSet = new PcSetClass(nexusSet);
+                _nexusSet.PackFromRight = packFromRight;
                 _nexusSetComplement = _nexusSet.GetComplement();
                 _primeForms = Functions.GenerateSetTables()[0];
             }

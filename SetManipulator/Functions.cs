@@ -1,8 +1,8 @@
-﻿/* File: Data.cs
+﻿/* File: Functions.cs
 ** Project: MusicTheory
 ** Author: Jeffrey Martin
 **
-** This file contains the implementation of the Data class.
+** This file contains the implementation of the Functions class.
 **
 ** Copyright © 2021 by Jeffrey Martin. All rights reserved.
 ** Email: jmartin@jeffreymartincomposer.com
@@ -280,6 +280,18 @@ namespace MusicTheory
             {"0123456789AB", "12-1" }
         };
 
+        // The Forte name table (left packing exceptions)
+        // from https://www.mta.ca/pc-set/pc-set_new/pages/pc-table/packed.html
+        private static string[,] _forteNameLeftPacking = new string[6, 2]
+        {
+            {"01378", "5-20" },
+            {"013589", "6-31" },
+            {"013689", "6-Z29" },
+            {"0123589", "7-Z18" },
+            {"0124789", "7-20" },
+            {"0124579A", "8-26" }
+        };
+
         // The Z-relation table
         private static string[,] _zNameArray = new string[46, 2]
         {
@@ -331,7 +343,7 @@ namespace MusicTheory
             {"8-Z29", "8-Z15" }
         };
 
-        // The Carter name table
+        // The Carter name table (after Carter's Harmony Book)
         private static string[,] _carterNameArray = new string[220, 2]
         {
             {"2-1", "1"},
@@ -556,26 +568,95 @@ namespace MusicTheory
             {"10-6", "6"}
         };
 
+        // The Carter derived core harmony table (after Link)
+        private static string[] _carterDerivedCoreArray = new string[52]
+        {
+            "01367",
+            "02368",
+            "012468",
+            "014568",
+            "013469",
+            "013679",
+            "012357",
+            "013479",
+            "012348",
+            "012456",
+            "012579",
+            "013578",
+            "023568",
+            "013467",
+            "014679",
+            "012567",
+            "012378",
+            "0124678",
+            "012468A",
+            "0123567",
+            "0123468",
+            "0124568",
+            "0123579",
+            "0123478",
+            "0123578",
+            "0124578",
+            "0123678",
+            "0134679",
+            "0125679",
+            "0145679",
+            "0135679",
+            "0124689",
+            "0234589",  // Left packing only
+            "0124789",  // Left packing only
+            "01236789",
+            "02345679",
+            "0134679A",
+            "01234589",
+            "01234569",
+            "01234789",
+            "0124678A",
+            "01345689",
+            "0134578A",
+            "01245789",
+            "01234689",
+            "01235789",
+            "01235689",
+            "01234678",
+            "01235679",
+            "01345679",
+            "0124578A",
+            "0124579A"  // Left packing only
+        };
+
         /// <summary>
-        /// Generates a collection of tables for Set
+        /// Generates a collection of tables for PcSetClass
         /// </summary>
         /// <returns>An array of tables</returns>
         public static Dictionary<string, string>[] GenerateSetTables()
         {
-            Dictionary<string, string>[] tables = new Dictionary<string, string>[4];
-            for (int i = 0; i < 4; i++)
+            Dictionary<string, string>[] tables = new Dictionary<string, string>[7];
+            for (int i = 0; i < 7; i++)
                 tables[i] = new Dictionary<string, string>();
+            // Tables 0 and 1: Forte and prime form lookup tables
             for (int i = 0; i < _forteNameArray.GetLength(0); i++)
             {
                 tables[0].Add(_forteNameArray[i, 0], _forteNameArray[i, 1]);
                 tables[1].Add(_forteNameArray[i, 1], _forteNameArray[i, 0]);
             }
+            // Tables 2 and 3: Left packing alternative tables
+            for (int i = 0; i < _forteNameLeftPacking.GetLength(0); i++)
+            {
+                tables[2].Add(_forteNameLeftPacking[i, 0], _forteNameLeftPacking[i, 1]);
+                tables[3].Add(_forteNameLeftPacking[i, 1], _forteNameLeftPacking[i, 0]);
+            }
+            // Table 4: Carter name lookup table (by Forte name)
             for (int i = 0; i < _carterNameArray.GetLength(0); i++)
             {
-                tables[2].Add(_carterNameArray[i, 0], _carterNameArray[i, 1]);
+                tables[4].Add(_carterNameArray[i, 0], _carterNameArray[i, 1]);
             }
+            // Table 5: Z-relation table
             for (int i = 0; i < _zNameArray.GetLength(0); i++)
-                tables[3].Add(_zNameArray[i, 0], _zNameArray[i, 1]);
+                tables[5].Add(_zNameArray[i, 0], _zNameArray[i, 1]);
+            // Table 6: Carter derived core harmonies
+            for (int i = 0; i < _carterDerivedCoreArray.Length; i++)
+                tables[6].Add(_carterDerivedCoreArray[i], "");
             return tables;
         }
     }

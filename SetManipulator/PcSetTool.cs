@@ -39,7 +39,23 @@ namespace SetManipulator
         SetComplex kh;
         Dictionary<string, string>[] tables;
         bool hasZ;
+        bool packFromRight;
         PrimarySetName preferForteName;
+
+        /// <summary>
+        /// Whether or not to pack from the right
+        /// </summary>
+        public override bool PackFromRight
+        {
+            get { return packFromRight; }
+            set {
+                packFromRight = value;
+                for (int i = 0; i < sc.Length; i++)
+                    sc[i].PackFromRight = value;
+                k.PackFromRight = value;
+                kh.PackFromRight = value;
+            }
+        }
 
         /// <summary>
         /// Whether or not to prefer Forte names
@@ -61,6 +77,7 @@ namespace SetManipulator
             k = new SetComplex();
             kh = new SetComplex();
             hasZ = false;
+            packFromRight = true;
             preferForteName = PrimarySetName.PrimeForm;
         }
 
@@ -118,10 +135,10 @@ namespace SetManipulator
             string command;
             Console.Write("Enter pcs (q to quit) > ");
             command = Console.ReadLine().ToUpper();
-            while (command[0] != 'Q')
+            while (command != "Q")
             {
                 pc = PcSeg.Parse(command);
-                if (pc.Count > 0 && PcSetClass.IsValidSet(pc))
+                if (pc.Count > 0)
                 {
                     sc[0].LoadFromPitchClassList(pc);
                     sc[1] = sc[0].GetComplement();
@@ -137,7 +154,7 @@ namespace SetManipulator
                     kh.LoadNexusSet(sc[0], SetComplexType.Kh);
                     Info();
                     Console.Write("You entered ");
-                    List<string> secondary = sc[0].FindTransformationName(pc);
+                    List<string> secondary = sc[0].FindTransformationName(PcSeg.ToPcSet(pc));
                     for (int i = 0; i < secondary.Count; i++)
                     {
                         if (i < secondary.Count - 2)
@@ -175,12 +192,12 @@ namespace SetManipulator
             if (preferForteName == PrimarySetName.Forte)
             {
                 Console.WriteLine(string.Format("{0,-28}{1,-12}", "Complement Forte name:", sc[1].ForteName));
-                Console.WriteLine(string.Format("{0,-28}{1,-12}", "Complement prime form name:", '(' + sc[1].PrimeFormName + ')'));
+                Console.WriteLine(string.Format("{0,-28}{1,-12}", "Complement prime form name:", '[' + sc[1].PrimeFormName + ']'));
                 Console.WriteLine(string.Format("{0,-28}{1,-12}", "Complement Carter name:", sc[1].CarterName));
             }
             else
             {
-                Console.WriteLine(string.Format("{0,-28}{1,-12}", "Complement prime form name:", '(' + sc[1].PrimeFormName + ')'));
+                Console.WriteLine(string.Format("{0,-28}{1,-12}", "Complement prime form name:", '[' + sc[1].PrimeFormName + ']'));
                 Console.WriteLine(string.Format("{0,-28}{1,-12}", "Complement Forte name:", sc[1].ForteName));
                 Console.WriteLine(string.Format("{0,-28}{1,-12}", "Complement Carter name:", sc[1].CarterName));
             }
@@ -197,7 +214,7 @@ namespace SetManipulator
             if (preferForteName == PrimarySetName.Forte)
                 Console.WriteLine("Set-complex K about " + sc[0].ForteName + ":\n");
             else
-                Console.WriteLine("Set-complex K about (" + sc[0].PrimeFormName + "):\n");
+                Console.WriteLine("Set-complex K about [" + sc[0].PrimeFormName + "]:\n");
 
             for (int i = 1; i <= 12; i++)
             {
@@ -225,7 +242,7 @@ namespace SetManipulator
                         {
                             for (int k = j; k < j + 5 && k < cardinalityList.Count; k++)
                             {
-                                Console.Write(string.Format("{0,-18}", '(' + e.Current.Value.PrimeFormName + ')'));
+                                Console.Write(string.Format("{0,-18}", '[' + e.Current.Value.PrimeFormName + ']'));
                                 e.MoveNext();
                             }
                             Console.Write("\n");
@@ -246,7 +263,7 @@ namespace SetManipulator
             if (preferForteName == PrimarySetName.Forte)
                 Console.WriteLine("Set-complex Kh about " + sc[0].ForteName + ":\n");
             else
-                Console.WriteLine("Set-complex Kh about (" + sc[0].PrimeFormName + "):\n");
+                Console.WriteLine("Set-complex Kh about [" + sc[0].PrimeFormName + "]:\n");
 
             for (int i = 1; i <= 12; i++)
             {
@@ -274,7 +291,7 @@ namespace SetManipulator
                         {
                             for (int k = j; k < j + 5 && k < cardinalityList.Count; k++)
                             {
-                                Console.Write(string.Format("{0,-18}", '(' + e.Current.Value.PrimeFormName + ')'));
+                                Console.Write(string.Format("{0,-18}", '[' + e.Current.Value.PrimeFormName + ']'));
                                 e.MoveNext();
                             }
                             Console.Write("\n");
@@ -282,6 +299,90 @@ namespace SetManipulator
                     }
                     Console.Write("\n");
                 }
+            }
+        }
+
+        /// <summary>
+        /// Calculates and displays derived core harmonies (after Link)
+        /// </summary>
+        public override void DerivedCore()
+        {
+            Pair<HashSet<PitchClass>, string>[] allForms = new Pair<HashSet<PitchClass>, string>[72];
+            List<Pair<HashSet<PitchClass>, string>> unioned = new List<Pair<HashSet<PitchClass>, string>>();
+            Dictionary<string, List<string>> found = new Dictionary<string, List<string>>();
+            List<Pair<string, List<string>>> final = new List<Pair<string, List<string>>>();
+            HashSet<PitchClass> ait1 = new HashSet<PitchClass>();
+            HashSet<PitchClass> ait2 = new HashSet<PitchClass>();
+            HashSet<PitchClass> ath = new HashSet<PitchClass>();
+
+            // Create all forms of the core harmonies
+            ait1.Add(new PitchClass(0));
+            ait1.Add(new PitchClass(1));
+            ait1.Add(new PitchClass(3));
+            ait1.Add(new PitchClass(7));
+            ait2.Add(new PitchClass(0));
+            ait2.Add(new PitchClass(1));
+            ait2.Add(new PitchClass(4));
+            ait2.Add(new PitchClass(6));
+            ath.Add(new PitchClass(0));
+            ath.Add(new PitchClass(1));
+            ath.Add(new PitchClass(2));
+            ath.Add(new PitchClass(4));
+            ath.Add(new PitchClass(7));
+            ath.Add(new PitchClass(8));
+            for (int i = 0; i < 12; i++)
+                allForms[i] = new Pair<HashSet<PitchClass>, string>(PcSet.Transpose(ait1, i), "(0137) T" + i.ToString());
+            for (int i = 0; i < 12; i++)
+                allForms[i + 12] = new Pair<HashSet<PitchClass>, string>(PcSet.Transpose(PcSet.Invert(ait1), i), "(0137) T" + i.ToString() + "I");
+            for (int i = 0; i < 12; i++)
+                allForms[i + 24] = new Pair<HashSet<PitchClass>, string>(PcSet.Transpose(ait2, i), "(0146) T" + i.ToString());
+            for (int i = 0; i < 12; i++)
+                allForms[i + 36] = new Pair<HashSet<PitchClass>, string>(PcSet.Transpose(PcSet.Invert(ait2), i), "(0146) T" + i.ToString() + "I");
+            for (int i = 0; i < 12; i++)
+                allForms[i + 48] = new Pair<HashSet<PitchClass>, string>(PcSet.Transpose(ath, i), "(012478) T" + i.ToString());
+            for (int i = 0; i < 12; i++)
+                allForms[i + 60] = new Pair<HashSet<PitchClass>, string>(PcSet.Transpose(PcSet.Invert(ath), i), "(012478) T" + i.ToString() + "I");
+
+            // Generate all possible unions (excluding self unions)
+            for (int i = 0; i < 72; i++)
+            {
+                for (int j = i + 1; j < 72; j++)
+                {
+                    unioned.Add(new Pair<HashSet<PitchClass>, string>(
+                        PcSet.Union(allForms[i].Item1, allForms[j].Item1),
+                        allForms[i].Item2 + ", " + allForms[j].Item2)
+                        );
+                }
+            }
+
+            // Catalog the unions and how they were made
+            foreach (Pair<HashSet<PitchClass>, string> p in unioned)
+            {
+                sc[4].LoadFromPitchClassSet(p.Item1);
+                if (!found.ContainsKey(sc[4].PrimeFormName))
+                    found.Add(sc[4].PrimeFormName, new List<string>());
+                found[sc[4].PrimeFormName].Add(p.Item2);
+            }
+
+            foreach (KeyValuePair<string, List<string>> pcsc in found)
+                final.Add(new Pair<string, List<string>>(pcsc.Key, pcsc.Value));
+
+            final.Sort((a, b) => {
+                    if (a.Item1.Length < b.Item1.Length)
+                        return -1;
+                    else if (a.Item1.Length > b.Item1.Length)
+                        return 1;
+                    else
+                        return a.Item1.CompareTo(b.Item1);
+                }
+            );
+
+            foreach (Pair<string, List<string>> pair in final)
+            {
+                Console.WriteLine("(" + pair.Item1 + ") made from");
+                foreach (string item in pair.Item2)
+                    Console.Write(item + "; ");
+                Console.WriteLine("\n");
             }
         }
 
@@ -320,18 +421,34 @@ namespace SetManipulator
                 if (preferForteName == PrimarySetName.Forte)
                 {
                     Console.WriteLine(string.Format("{0,-17}{1,-12}", "Forte name:", sc[0].ForteName));
-                    Console.WriteLine(string.Format("{0,-17}{1,-12}", "Prime form name:", '(' + sc[0].PrimeFormName + ')'));
-                    Console.WriteLine(string.Format("{0,-17}{1,-12}", "Carter name:", sc[0].CarterName));
+                    Console.WriteLine(string.Format("{0,-17}{1,-12}", "Prime form name:", '[' + sc[0].PrimeFormName + ']'));
+                    Console.Write(string.Format("{0,-17}{1,-12}", "Carter name:", sc[0].CarterName));
+                    if (sc[0].GetIsDerivedCore())
+                        Console.WriteLine("Derived core harmony");
+                    else
+                        Console.WriteLine();
                     Console.WriteLine(string.Format("{0,-17}{1,-12}", "IC vector:", sc[0].ICVectorName));
-                    Console.WriteLine(string.Format("{0,-17}{1,-12}", "Complement:", sc[1].ForteName));
+                    Console.Write(string.Format("{0,-17}{1,-12}", "Complement:", sc[1].ForteName));
+                    if (sc[1].GetIsDerivedCore())
+                        Console.WriteLine("Derived core complement");
+                    else
+                        Console.WriteLine();
                 }
                 else
                 {
-                    Console.WriteLine(string.Format("{0,-17}{1,-12}", "Prime form name:", '(' + sc[0].PrimeFormName + ')'));
+                    Console.WriteLine(string.Format("{0,-17}{1,-12}", "Prime form name:", '[' + sc[0].PrimeFormName + ']'));
                     Console.WriteLine(string.Format("{0,-17}{1,-12}", "Forte name:", sc[0].ForteName));
-                    Console.WriteLine(string.Format("{0,-17}{1,-12}", "Carter name:", sc[0].CarterName));
+                    Console.Write(string.Format("{0,-17}{1,-12}", "Carter name:", sc[0].CarterName));
+                    if (sc[0].GetIsDerivedCore())
+                        Console.WriteLine("Derived core harmony");
+                    else
+                        Console.WriteLine();
                     Console.WriteLine(string.Format("{0,-17}{1,-12}", "IC vector:", sc[0].ICVectorName));
-                    Console.WriteLine(string.Format("{0,-17}{1,-12}", "Complement:", '(' + sc[1].PrimeFormName + ')'));
+                    Console.Write(string.Format("{0,-17}{1,-12}", "Complement:", '[' + sc[1].PrimeFormName + ']'));
+                    if (sc[1].GetIsDerivedCore())
+                        Console.WriteLine("Derived core complement");
+                    else
+                        Console.WriteLine();
                 }
             }
             else
@@ -346,18 +463,34 @@ namespace SetManipulator
                     if (preferForteName == PrimarySetName.Forte)
                     {
                         Console.WriteLine(string.Format("{0,-17}{1,-12}", "Forte name:", sc[3].ForteName));
-                        Console.WriteLine(string.Format("{0,-17}{1,-12}", "Prime form name:", '(' + sc[3].PrimeFormName + ')'));
-                        Console.WriteLine(string.Format("{0,-17}{1,-12}", "Carter name:", sc[3].CarterName));
+                        Console.WriteLine(string.Format("{0,-17}{1,-12}", "Prime form name:", '[' + sc[3].PrimeFormName + ']'));
+                        Console.Write(string.Format("{0,-17}{1,-12}", "Carter name:", sc[3].CarterName));
+                        if (sc[0].GetIsDerivedCore())
+                            Console.WriteLine("Derived core harmony");
+                        else
+                            Console.WriteLine();
                         Console.WriteLine(string.Format("{0,-17}{1,-12}", "IC vector:", sc[3].ICVectorName));
-                        Console.WriteLine(string.Format("{0,-17}{1,-12}", "Complement:", sc[4].ForteName));
+                        Console.Write(string.Format("{0,-17}{1,-12}", "Complement:", sc[4].ForteName));
+                        if (sc[4].GetIsDerivedCore())
+                            Console.WriteLine("Derived core complement");
+                        else
+                            Console.WriteLine();
                     }
                     else
                     {
-                        Console.WriteLine(string.Format("{0,-17}{1,-12}", "Prime form name:", '(' + sc[3].PrimeFormName + ')'));
+                        Console.WriteLine(string.Format("{0,-17}{1,-12}", "Prime form name:", '[' + sc[3].PrimeFormName + ']'));
                         Console.WriteLine(string.Format("{0,-17}{1,-12}", "Forte name:", sc[3].ForteName));
-                        Console.WriteLine(string.Format("{0,-17}{1,-12}", "Carter name:", sc[3].CarterName));
+                        Console.Write(string.Format("{0,-17}{1,-12}", "Carter name:", sc[3].CarterName));
+                        if (sc[0].GetIsDerivedCore())
+                            Console.WriteLine("Derived core harmony");
+                        else
+                            Console.WriteLine();
                         Console.WriteLine(string.Format("{0,-17}{1,-12}", "IC vector:", sc[3].ICVectorName));
-                        Console.WriteLine(string.Format("{0,-17}{1,-12}", "Complement:", '(' + sc[4].PrimeFormName + ')'));
+                        Console.Write(string.Format("{0,-17}{1,-12}", "Complement:", '[' + sc[4].PrimeFormName + ']'));
+                        if (sc[4].GetIsDerivedCore())
+                            Console.WriteLine("Derived core complement");
+                        else
+                            Console.WriteLine();
                     }
                 }
                 else
@@ -629,20 +762,26 @@ namespace SetManipulator
         /// <param name="command">A pcset string</param>
         public override void Subsets(string command = "")
         {
-            List<HashSet<PitchClass>> subsets;
-            List<HashSet<PitchClass>>.Enumerator e;
+            List<List<PitchClass>> orderedSubsets = new List<List<PitchClass>>();
+            List<List<PitchClass>>.Enumerator e;
             if (command == "")
             {
-                subsets = PcSet.Subsets(pcset[0]);
-                e = subsets.GetEnumerator();
+                foreach (HashSet<PitchClass> set in PcSet.Subsets(pcset[0]))
+                    orderedSubsets.Add(PcSet.ToPcSeg(set));
+                foreach (List<PitchClass> list in orderedSubsets)
+                    list.Sort();
+
+                orderedSubsets = PcSeg.SortPcsegList(orderedSubsets);
+
+                e = orderedSubsets.GetEnumerator();
                 e.MoveNext();
 
-                for (int j = 0; j < subsets.Count; j += 5)
+                for (int j = 0; j < orderedSubsets.Count; j += 5)
                 {
-                    for (int k = j; k < j + 5 && k < subsets.Count; k++)
+                    for (int k = j; k < j + 5 && k < orderedSubsets.Count; k++)
                     {
                         Console.Write(string.Format("{0,-18}", '{' +
-                            PcSeg.ToString(PcSet.ToSortedPcSeg(e.Current)) + '}'));
+                            PcSeg.ToString(e.Current) + '}'));
                         e.MoveNext();
                     }
                     Console.Write("\n");
@@ -650,19 +789,25 @@ namespace SetManipulator
             }
             else
             {
-                List<PitchClass> pcs = PcSeg.Parse(command);
-                if (pcs.Count > 0 && PcSetClass.IsValidSet(pcs))
+                HashSet<PitchClass> pcs = PcSeg.ToPcSet(PcSeg.Parse(command));
+                if (pcs.Count > 0)
                 {
-                    subsets = PcSet.Subsets(PcSeg.ToPcSet(pcs));
-                    e = subsets.GetEnumerator();
+                    foreach (HashSet<PitchClass> set in PcSet.Subsets(pcs))
+                        orderedSubsets.Add(PcSet.ToPcSeg(set));
+                    foreach (List<PitchClass> list in orderedSubsets)
+                        list.Sort();
+
+                    orderedSubsets = PcSeg.SortPcsegList(orderedSubsets);
+
+                    e = orderedSubsets.GetEnumerator();
                     e.MoveNext();
 
-                    for (int j = 0; j < subsets.Count; j += 5)
+                    for (int j = 0; j < orderedSubsets.Count; j += 5)
                     {
-                        for (int k = j; k < j + 5 && k < subsets.Count; k++)
+                        for (int k = j; k < j + 5 && k < orderedSubsets.Count; k++)
                         {
                             Console.Write(string.Format("{0,-18}", '{' +
-                                PcSeg.ToString(PcSet.ToSortedPcSeg(e.Current)) + '}'));
+                                PcSeg.ToString(e.Current) + '}'));
                             e.MoveNext();
                         }
                         Console.Write("\n");
@@ -721,17 +866,12 @@ namespace SetManipulator
                     for (int j = 0; j < subsets.Count; j += 5)
                     {
                         for (int k = j; k < j + 5 && k < subsets.Count; k++)
-                            Console.Write(string.Format("{0,-22}", '(' + subsets[k].Item1.PrimeFormName + ") - " + subsets[k].Item2.ToString()));
+                            Console.Write(string.Format("{0,-22}", '[' + subsets[k].Item1.PrimeFormName + ") - " + subsets[k].Item2.ToString()));
                         Console.Write("\n");
                     }
                 }
                 Console.Write("\n");
             }
-
-            if (preferForteName == PrimarySetName.Forte)
-                Console.WriteLine(sc[3].SetType + "s:\n" + sc[3].ForteName + ": 1");
-            else
-                Console.WriteLine(sc[3].SetType + "s:\n(" + sc[3].PrimeFormName + ") - 1");
         }
 
         /// <summary>
@@ -894,12 +1034,12 @@ namespace SetManipulator
                 if (preferForteName == PrimarySetName.Forte)
                 {
                     Console.WriteLine(string.Format("{0,-28}{1,-12}", "Z-relation Forte name:", sc[2].ForteName));
-                    Console.WriteLine(string.Format("{0,-28}{1,-12}", "Z-relation prime form name:", '(' + sc[2].PrimeFormName + ')'));
+                    Console.WriteLine(string.Format("{0,-28}{1,-12}", "Z-relation prime form name:", '[' + sc[2].PrimeFormName + ']'));
                     Console.WriteLine(string.Format("{0,-28}{1,-12}", "Z-relation Carter name:", sc[2].CarterName));
                 }
                 else
                 {
-                    Console.WriteLine(string.Format("{0,-28}{1,-12}", "Z-relation prime form name:", '(' + sc[2].PrimeFormName + ')'));
+                    Console.WriteLine(string.Format("{0,-28}{1,-12}", "Z-relation prime form name:", '[' + sc[2].PrimeFormName + ']'));
                     Console.WriteLine(string.Format("{0,-28}{1,-12}", "Z-relation Forte name:", sc[2].ForteName));
                     Console.WriteLine(string.Format("{0,-28}{1,-12}", "Z-relation Carter name:", sc[2].CarterName));
                 }

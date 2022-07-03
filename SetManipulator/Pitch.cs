@@ -87,6 +87,20 @@ namespace MusicTheory
         }
 
         /// <summary>
+        /// Allows sorting
+        /// </summary>
+        /// <param name="obj">The object to compare to</param>
+        /// <returns>A sorting integer</returns>
+        public new int CompareTo(object obj)
+        {
+            if (obj == null)
+                return 1;
+            Pitch pc = obj as Pitch;
+            return _noteNumber.CompareTo(pc._noteNumber);
+        }
+
+
+        /// <summary>
         /// Gets the hash code of the current Pitch
         /// </summary>
         /// <returns>The hash code</returns>
